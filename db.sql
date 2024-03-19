@@ -1,3 +1,4 @@
+-- Active: 1710876326653@@ist-linkedin.c1gqwxxyqcc1.ap-southeast-1.rds.amazonaws.com@null@ist_hub
 
 
 CREATE TABLE IF NOT EXISTS user(
@@ -12,7 +13,6 @@ CREATE TABLE IF NOT EXISTS user(
     photo varchar(100) NOT NULL,
     verified boolean,
     PRIMARY KEY(userid)
-
 );
 
 CREATE TABLE IF NOT EXISTS education(
