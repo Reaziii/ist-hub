@@ -1,10 +1,10 @@
 import mysql from 'mysql';
 
 const conn = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'ist_hub',
+    host: process.env.MYSQLHOST,
+    user: process.env.MYSQLUSERNAME,
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQLDB,
 });
 
 

@@ -1,23 +1,35 @@
 import conn from '@/lib/mysql'
 import React, { FC } from 'react'
-
+import Image from 'next/image'
+import { TextField } from '@mui/material'
+import Input from '@/components/Input'
 const Registration: FC<React.ReactNode> = () => {
-    conn.query(`CREATE TABLE Persons (
-        PersonID int,
-        LastName varchar(255),
-        FirstName varchar(255),
-        Address varchar(255),
-        City varchar(255)
-    );`, (err, res)=>{
-        if(err){
-            console.log("something went wrong");
+    conn.query("SELECT * FROM Persons", (err, res) => {
+        if (err) {
+            console.log("Connection failed")
         }
-        else{
-            console.log(res)
+        else {
+            console.log("connected")
         }
     })
     return (
-        <div>Registration</div>
+        <div className='flex'>
+            <div
+                className='h-[100vh] w-[40%] bg-main relative flex items-center'
+            >
+                <img src="/registration-bg.svg" alt="registration" className='w-full absolute right-[-100px]' />
+            </div>
+            <div className='ml-[60px] mt-[100px]'>
+                <form>
+                    <div>
+                        <input
+                            className='h-[40px]'
+                            placeholder='your full name'
+                        />
+                    </div>
+                </form>
+            </div>
+        </div>
     )
 }
 

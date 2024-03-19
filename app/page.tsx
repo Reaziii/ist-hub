@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <main className="h-full w-full bg-main">
+    <main className="h-[100vh] w-full bg-main">
 
     </main>
   );
