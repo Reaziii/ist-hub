@@ -14,3 +14,12 @@ CREATE TABLE IF NOT EXISTS user(
     primary key(userid)
 
 );
+CREATE TABLE IF NOT EXISTS edication(
+    userid int,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    grade FLOAT(2,2) NOT NULL,
+    degree varchar(20) NOT NULL,
+    school varchar(100) NOT NULL,
+    FOREIGN KEY (userid) REFERENCES user(userid)
+);
