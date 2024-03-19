@@ -1,8 +1,6 @@
+import Input from '@/components/Input'
 import conn from '@/lib/mysql'
 import React, { FC } from 'react'
-import Image from 'next/image'
-import { TextField } from '@mui/material'
-import Input from '@/components/Input'
 const Registration: FC<React.ReactNode> = () => {
     conn.query("SELECT * FROM Persons", (err, res) => {
         if (err) {
@@ -19,11 +17,11 @@ const Registration: FC<React.ReactNode> = () => {
             >
                 <img src="/registration-bg.svg" alt="registration" className='w-full absolute right-[-100px]' />
             </div>
-            <div className='ml-[60px] mt-[100px]'>
-                <form>
-                    <div>
-                        <input
-                            className='h-[40px]'
+            <div className='ml-[60px] mt-[100px] w-[60%]'>
+                <form className='w-full'>
+                    <div className='w-full'>
+                        <Input
+                            className='h-[40px] w-[50%] text-[12px] outline-none'
                             placeholder='your full name'
                         />
                     </div>
