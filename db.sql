@@ -66,3 +66,14 @@ CREATE TABLE IF NOT EXISTS verify(
     FOREIGN KEY (verifiedby) REFERENCES user(userid),
     FOREIGN KEY (userid) REFERENCES user(userid)
 );
+
+
+CREATE TABLE IF NOT EXISTS email_verification(
+    userid int NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    code varchar(6) NOT NULL,
+    time int NOT NULL,
+    tried int NOT NULL,
+    FOREIGN KEY (userid) REFERENCES user(userid)
+)
+
