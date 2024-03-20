@@ -16,7 +16,7 @@ const Form: React.FC<{ children: React.ReactNode, action?: (form: FormData) => P
                     type: "success"
 
                 })
-                document.cookie = `token=${res.token};`
+                window.document.cookie = `token=${res.token};`
                 localStorage.setItem("token", res?.token as string)
                 window.location.href = "/"
             } else {

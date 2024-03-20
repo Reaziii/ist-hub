@@ -2,8 +2,10 @@
 import React, { useEffect } from 'react'
 
 const Logout = () => {
-    document.cookie = "token=;"
-    window.location.href = "/login"
+    useEffect(() => {
+        window.document.cookie = "token=;"
+        window.location.href = "/login"
+    }, [])
     return (
         <></>
     )
