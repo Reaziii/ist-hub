@@ -2,7 +2,7 @@ import React, { FC } from 'react'
 import Input from '@/components/Input'
 import { registration } from '@/lib/auth'
 import Form from './Form'
-const Registration: FC<React.ReactNode> = async () => {
+const Registration = async () => {
     const handleRegistration = async (form: FormData) => {
         "use server"
         return await registration(form);
