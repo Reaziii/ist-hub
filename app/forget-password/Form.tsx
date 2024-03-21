@@ -1,7 +1,7 @@
 "use client"
 import { Alert, Snackbar } from '@mui/material'
 import React, { useState } from 'react'
-const Form: React.FC<{ children: React.ReactNode, action?: (form: FormData) => Promise<{ success: boolean, msg?: string }>, className?: string }> = ({ children, action, className }) => {
+const Form: React.FC<{ children: React.ReactNode, action?: (form: FormData) => Promise<{ success: boolean, msg?: string, token?: string }>, className?: string }> = ({ children, action, className }) => {
     const [status, setStatus] = useState<{ type: string | null, msg: string, open: boolean }>({
         type: null,
         msg: "",
@@ -16,7 +16,9 @@ const Form: React.FC<{ children: React.ReactNode, action?: (form: FormData) => P
                     type: "success"
 
                 })
-                // window.location.href = "/verify?email="+form.get("email")
+                window.document.cookie = `token=${res.token};`
+                localStorage.setItem("token", res?.token as string)
+                window.location.href = "/forget-password/verify?email=" + form.get("email")
             } else {
                 setStatus({
                     msg: res.msg ?? "",

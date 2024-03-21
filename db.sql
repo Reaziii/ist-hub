@@ -1,6 +1,5 @@
 -- Active: 1710876326653@@ist-linkedin.c1gqwxxyqcc1.ap-southeast-1.rds.amazonaws.com@null@ist_hub
 
-
 CREATE TABLE IF NOT EXISTS user(
     userid int NOT NULL AUTO_INCREMENT,
     fullname varchar(30) NOT NULL,

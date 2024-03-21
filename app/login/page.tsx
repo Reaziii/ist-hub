@@ -49,7 +49,7 @@ const Registration = async () => {
                         className='h-[40px] w-[49%] bg-main text-white rounded-lg font-bold mt-[30px] mb-[40px]'
                         value={"submit"}>Submit</button>
                     <br />
-                    <a className='text-[14px]' href='/registration'>Don't have account?</a>
+                    <a className='text-[14px]' href='/registration'>Don't have an account?</a>
                 </Form>
             </div>
         </div>
