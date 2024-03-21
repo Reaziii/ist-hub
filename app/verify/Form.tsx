@@ -17,6 +17,7 @@ const Form: React.FC<{ children: React.ReactNode, action?: (form: FormData) => P
 
                 })
                 // window.location.href = "/verify?email="+form.get("email")
+                window.location.href = "/login"
             } else {
                 setStatus({
                     msg: res.msg ?? "",
