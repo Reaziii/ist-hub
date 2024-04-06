@@ -3,17 +3,9 @@ import conn from "./mysql";
 import otpgenerator from 'otp-generator'
 import sendmail from './sendmail'
 import jsonwebtoken from 'jsonwebtoken'
-export const registration = async (form: FormData): Promise<{ success: boolean, msg?: string }> => {
+export const registration = async (name: string, email: string, dept: string, batch: number, roll: number, phone: string, pass: string, conPass: string): Promise<{ success: boolean, msg: string }> => {
+    "use server";
     try {
-        let name = form.get("name");
-        let email = form.get("email")
-        let dept = form.get("department")
-        let batch = form.get("batch")
-        let roll = form.get("roll")
-        let phone = form.get("phone")
-        let pass = form.get("password")
-        let conPass = form.get("con-pass")
-
         if (!name || !email || !dept || !batch || !roll || !phone || !conPass || !pass) {
             return { success: false, msg: "All field required" }
         }
@@ -21,9 +13,9 @@ export const registration = async (form: FormData): Promise<{ success: boolean, 
         if (pass !== conPass) {
             return { success: false, msg: "Password doesn't match" }
         }
-
+        let username = `${dept.toString().toLowerCase()}-${batch}-${roll}`;
         let values = [
-            [name, dept, batch, roll, phone, email, pass]
+            [name, dept, batch, roll, phone, email, pass, username]
         ]
 
         let sql = "select * from user where email_verified = ? and (email = ? or roll_no = ? or phone = ?)";
@@ -37,7 +29,7 @@ export const registration = async (form: FormData): Promise<{ success: boolean, 
         await conn.query(sql, [email]);
         sql = "delete from user where email = ?"
         await conn.query(sql, [email]);
-        sql = `insert into user(fullname, department, batch, roll_no, phone, email, password) values ?`
+        sql = `insert into user(fullname, department, batch, roll_no, phone, email, password, username) values ?`
         data = await conn.query(sql, [values])
         sql = `select userid from user where email = ?`
         data = await conn.query(sql, [email]) as any[]
@@ -59,10 +51,10 @@ export const registration = async (form: FormData): Promise<{ success: boolean, 
 }
 
 
-export const verifyEmail = async (form: FormData): Promise<{ success: boolean, msg?: string }> => {
+export const verifyEmail = async (email: string, code: string): Promise<{ success: boolean, msg: string }> => {
+    "use server";
     try {
-        let email = form.get("email")
-        let code = form.get("code");
+        
         let sql = `select * from email_verification where email = ? and code = ?`
         let data = await conn.query(sql, [email, code]) as any[]
 
@@ -81,7 +73,7 @@ export const verifyEmail = async (form: FormData): Promise<{ success: boolean, m
         return { success: false, msg: "server error" }
     }
 
-    return { success: true }
+
 }
 
 
@@ -103,7 +95,9 @@ export const login = async (form: FormData): Promise<{ success: boolean, msg?: s
             email: email,
             photo: data[0][0].photo,
             roll_no: data[0][0].roll_no,
-            batch: data[0][0].batch
+            batch: data[0][0].batch,
+            username: data[0][0].username,
+            verified: data[0][0].verified,
         }, process.env.JWTSECRET ?? "ISTHUB")
 
         return { success: true, msg: "Login successfull", token }
@@ -144,24 +138,24 @@ export const forgetpassword = async (form: FormData): Promise<{ success: boolean
     }
 }
 
-export const verifyAndChangePassword = async (form: FormData):Promise<{success : boolean, msg? : string}> => {
+export const verifyAndChangePassword = async (form: FormData): Promise<{ success: boolean, msg?: string }> => {
     try {
         let email = form.get("email")
         let password = form.get("password");
         let confirmpassword = form.get("con-pass")
         let code = form.get("code");
-        if(password!==confirmpassword){
-            return {success : false, msg : "Confirm password doesn't match"}
+        if (password !== confirmpassword) {
+            return { success: false, msg: "Confirm password doesn't match" }
         }
         let verify = await verifyEmail(form);
 
-        if(verify.success===false){
+        if (verify.success === false) {
             return verify;
         }
         let sql = `update user set password = ? where email = ?`
         let data = await conn.query(sql, [password, email]);
-        return {success : true,msg : "Password changed"};
+        return { success: true, msg: "Password changed" };
     } catch (err) {
-        return {success : true, msg : "Server error"}
+        return { success: true, msg: "Server error" }
     }
 }

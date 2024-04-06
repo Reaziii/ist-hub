@@ -16,7 +16,7 @@ const Header = async () => {
                     <span> | </span>
                     <a href={"/registration"}>Registration</a>
                 </div> : <div>
-                    <a href="/">{usr.usr?.name}</a>
+                    <a href={`/profile/${usr.usr?.username}`}>{usr.usr?.name}</a>
                     <span> | </span>
                     <a href='/logout'>Logout</a>
                 </div>

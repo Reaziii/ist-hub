@@ -1,4 +1,6 @@
--- Active: 1710876326653@@ist-linkedin.c1gqwxxyqcc1.ap-southeast-1.rds.amazonaws.com@null@ist_hub
+-- Active: 1710972936505@@ist-linkedin.c1gqwxxyqcc1.ap-southeast-1.rds.amazonaws.com@null@ist_hub
+
+create DATABASE ist_hub;
 
 CREATE TABLE IF NOT EXISTS user(
     userid int NOT NULL AUTO_INCREMENT,
@@ -11,6 +13,8 @@ CREATE TABLE IF NOT EXISTS user(
     password varchar(100) NOT NULL,
     photo varchar(100) NOT NULL,
     verified boolean,
+    username VARCHAR(20),
+    email_verified BOOLEAN,
     PRIMARY KEY(userid)
 );
 
@@ -75,4 +79,5 @@ CREATE TABLE IF NOT EXISTS email_verification(
     tried int NOT NULL,
     FOREIGN KEY (userid) REFERENCES user(userid)
 )
+
 
