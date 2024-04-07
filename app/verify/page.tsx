@@ -10,6 +10,7 @@ const Verify: React.FC<{ searchParams?: { [key: string]: string | string[] | und
     if (!email) {
         redirect("/")
     }
+    email = decodeURIComponent(email as string)
 
     return (
         <>

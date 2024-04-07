@@ -3,14 +3,16 @@ import ButtonSpinner from '@/components/ButtonSpinner'
 import Input from '@/components/TextInput'
 import handleToast from '@/components/handleToast'
 import { Formik } from 'formik'
+import { useRouter } from 'next/navigation'
 import React from 'react'
 import { ToastContainer } from 'react-toastify'
 import * as yup from 'yup'
 const CodeVerificationSchema = yup.object().shape({
-    code: yup.string().required("").min(6)
+    code: yup.string().required("Please enter the varification code").min(6, 'Lenght must be 6 character').max(6, 'Length must be 6 character')
 })
 
 const VerifyForm: React.FC<{ email: string, handleVerify: (email: string, code: string) => Promise<{ success: boolean, msg: string }> }> = ({ email, handleVerify }) => {
+    const route = useRouter();
     return (
         <Formik
             initialValues={{
@@ -21,11 +23,18 @@ const VerifyForm: React.FC<{ email: string, handleVerify: (email: string, code: 
                 handleVerify(values.email, values.code).then(res => {
                     handleToast(res);
                     setSubmitting(false);
+                    if (res.success) {
+                        route.push("/login")
+                    }
                 })
             }}
             validationSchema={CodeVerificationSchema}
+            enableReinitialize
+            isInitialValid
         >
             {({ isSubmitting, values, handleChange, touched, handleSubmit, errors }) => {
+                console.log(errors)
+                console.log(touched)
                 return <section className="bg-gray-50 dark:bg-gray-900">
                     <ToastContainer />
                     <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">

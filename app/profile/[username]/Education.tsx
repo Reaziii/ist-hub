@@ -30,8 +30,8 @@ const Education = () => {
             <h1 className='font-bold text-[20px]'>Education</h1>
             <div>
                 {
-                    educations.map((item) => (
-                        <div className='mt-[20px]'>
+                    educations.map((item, key) => (
+                        <div key={key} className='mt-[20px]'>
                             <h1 className='font-bold'>{item.school}</h1>
                             <p className='text-[12px]'>{item.degree}</p>
                             <p className='text-[12px] text-gray-500'>

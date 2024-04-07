@@ -54,7 +54,7 @@ export const registration = async (name: string, email: string, dept: string, ba
 export const verifyEmail = async (email: string, code: string): Promise<{ success: boolean, msg: string }> => {
     "use server";
     try {
-        
+
         let sql = `select * from email_verification where email = ? and code = ?`
         let data = await conn.query(sql, [email, code]) as any[]
 
@@ -65,11 +65,10 @@ export const verifyEmail = async (email: string, code: string): Promise<{ succes
         sql = `update user set email_verified = ? where email = ?`
         data = await conn.query(sql, [true, email,])
         sql = `delete from email_verification where email = ? and code = ?`
-        data = await conn.query(sql, [email, code])
-
+        await conn.query(sql, [email, code])
         return { success: true, msg: "Verified successfully" }
     } catch (err) {
-        console.log(err)
+        console.log('[verifyemail failed]====>\n', err)
         return { success: false, msg: "server error" }
     }
 
@@ -80,19 +79,17 @@ export const verifyEmail = async (email: string, code: string): Promise<{ succes
 
 
 
-export const login = async (form: FormData): Promise<{ success: boolean, msg?: string, token?: string }> => {
+export const login = async (params: { email: string, password: string }): Promise<{ success: boolean, msg: string, token?: string }> => {
+    "use server";
     try {
-        let email = form.get("email")
-        let password = form.get("password");
-        console.log(email, password)
         let sql = `select * from user where email = ? and password = ? and email_verified = true`
-        let data = await conn.query(sql, [email, password]) as any[]
+        let data = await conn.query(sql, [params.email, params.password]) as any[]
         if (data[0].length === 0) {
             return { success: false, msg: "Invalid email or password" }
         }
         let token = jsonwebtoken.sign({
             name: data[0][0].fullname,
-            email: email,
+            email: params.email,
             photo: data[0][0].photo,
             roll_no: data[0][0].roll_no,
             batch: data[0][0].batch,
@@ -103,11 +100,9 @@ export const login = async (form: FormData): Promise<{ success: boolean, msg?: s
         return { success: true, msg: "Login successfull", token }
 
     } catch (err) {
-        console.log(err)
+        console.log('[Login failed]====>\n', err)
+        return { success: false, msg: "Login failed" }
     }
-
-
-    return { success: false }
 }
 
 export const forgetpassword = async (form: FormData): Promise<{ success: boolean, msg: string }> => {
@@ -134,6 +129,7 @@ export const forgetpassword = async (form: FormData): Promise<{ success: boolean
 
 
     } catch (err) {
+        console.log('[forgetpassword failed]====>\n', err)
         return { success: false, msg: "Server error!" }
     }
 }
@@ -147,15 +143,16 @@ export const verifyAndChangePassword = async (form: FormData): Promise<{ success
         if (password !== confirmpassword) {
             return { success: false, msg: "Confirm password doesn't match" }
         }
-        let verify = await verifyEmail(form);
+        let verify = await verifyEmail(email as string, code as string);
 
         if (verify.success === false) {
             return verify;
         }
         let sql = `update user set password = ? where email = ?`
-        let data = await conn.query(sql, [password, email]);
+        await conn.query(sql, [password, email]);
         return { success: true, msg: "Password changed" };
     } catch (err) {
+        console.log('[verifyandchangepassword failed]====>\n', err)
         return { success: true, msg: "Server error" }
     }
 }

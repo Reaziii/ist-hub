@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "lib/sendmail.js", "lib/sendmail.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "lib/sendmail.js", "lib/sendmail.js", "lib/upload.ts", "lib/upload.ts"],
   "exclude": ["node_modules"]
 }

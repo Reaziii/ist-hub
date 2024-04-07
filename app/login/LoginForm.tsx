@@ -3,9 +3,12 @@
 
 import ButtonSpinner from '@/components/ButtonSpinner'
 import Input from '@/components/TextInput'
+import handleToast from '@/components/handleToast'
 import { Formik, FormikProps } from 'formik'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import React from 'react'
+import { ToastContainer } from 'react-toastify'
 import * as yup from 'yup'
 
 interface LoginProps {
@@ -18,24 +21,33 @@ const schema = yup.object().shape({
     password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
     remember: yup.boolean().default(false),
 });
-const LoginForm = () => {
+const LoginForm: React.FC<{ login: (params: { email: string, password: string }) => Promise<{ success: boolean, msg: string, token?: string }> }> = ({ login }) => {
     let initialValues: LoginProps = {
         email: "",
         password: "",
         remember: false
     }
+    let router = useRouter();
     return (
         <Formik
             initialValues={initialValues}
             onSubmit={(values: any, { setSubmitting }) => {
-                setTimeout(() => setSubmitting(false), 500)
+                login(values).then(res => {
+                    handleToast(res);
+                    if (res.success) {
+                        window.document.cookie = `token=${res.token};`
+                        localStorage.setItem("token", res.token as string)
+                        router.push("/")
+                    }
+                    setSubmitting(false);
+                }).catch(() => setSubmitting(false))
             }}
             validationSchema={schema}
         >
             {({ isSubmitting, handleSubmit, values, handleChange, errors, touched }: FormikProps<LoginProps>) => {
                 return (
-
                     <section className="bg-gray-50 ">
+                        <ToastContainer />
                         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                             <div className="w-full bg-white rounded-lg shadow  md:mt-0 sm:max-w-md xl:p-0  ">
                                 <div className="p-6 space-y-4 md:space-y-6 sm:p-8">

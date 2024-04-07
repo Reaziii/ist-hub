@@ -5,9 +5,13 @@ import { MdOutlineAlternateEmail } from "react-icons/md";
 import About from './About';
 import Education from './Education';
 import Experiences from './Experiences';
+import ProfilePicture from './ProfilePicture';
+import { getProfileDetails, uploadProfilePicture } from '@/lib/profile';
 
 const MyProfile: React.FC = async () => {
     const usr = await user();
+    const profile = await getProfileDetails();
+
     const about = `
 I am currently pursing my B.Sc in computer Science and Engineering from Institute of Science and Technology, Bangladesh.I am currently pursing my B.Sc in computer Science and Engineering from Institute of Science and Technology, Bangladesh.I am currently pursing my B.Sc in computer Science and Engineering from Institute of Science and Technology, Bangladesh.
 
@@ -44,13 +48,13 @@ Leetcode: https://leetcode.com/reaziii/
 `
     return (
         <div className='w-full px-[40px] box-border'>
-            <div className='border border-[#ccc] mt-[20px] rounded-lg pb-[40px] overflow-hidden bg-white'>
+            <div className='border border-[#ccc] mt-[20px] pb-[40px] overflow-hidden bg-white rounded-lg shadow'>
                 <div style={{
                     backgroundImage: `url("/black-line.svg")`,
                     backgroundSize: 'cover',
                     backgroundRepeat: "no-repeat",
                 }} className='w-full h-[200px]  relative'>
-                    <img className='h-[200px] w-[200px] bottom-[-50px] left-[50px] rounded-full absolute' src="http://res.cloudinary.com/dlflltzfi/image/upload/v1697138820/pcist/07d2eede4ff2fa4d5262a55e4ac41e6f_ibx5ix.jpg" alt="" />
+                    <ProfilePicture uploadImage={uploadProfilePicture} dp={profile.profile?.photo ?? ""} />
                 </div>
                 <div className='px-[40px]  mt-[60px]'>
                     <div className='flex items-center gap-[20px]'>
@@ -71,7 +75,7 @@ Leetcode: https://leetcode.com/reaziii/
             </div>
             <About about={about} />
             <Education />
-            <Experiences/>
+            <Experiences />
         </div>
     )
 }

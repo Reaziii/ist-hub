@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 
-const handleToast = (resp: { success: boolean, msg?: string }) => {
+const handleToast = (resp: { success: boolean, msg: string }) => {
     if (resp.success) {
         return toast.success(resp.msg ?? "Request successfull", {
             position: "top-right",

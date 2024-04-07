@@ -53,7 +53,7 @@ const RegistrationForm: React.FC<{ handleRegistration: (name: string, email: str
                     setSubmitting(false);
                     if (res.success) {
                         localStorage.setItem("verifyemail", values.email);
-                        router.push(`/verify/?email=${values.email}`)
+                        router.push(`/verify/?email=${encodeURIComponent(values.email)}`)
                     }
                 })
             }}
