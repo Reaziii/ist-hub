@@ -54,7 +54,7 @@ Leetcode: https://leetcode.com/reaziii/
                     backgroundSize: 'cover',
                     backgroundRepeat: "no-repeat",
                 }} className='w-full h-[200px]  relative'>
-                    <ProfilePicture uploadImage={uploadProfilePicture} dp={profile.profile?.photo ?? ""} />
+                    <ProfilePicture uploadImage={uploadProfilePicture} dp={profile.profile?.photo ?? "asdfasdf"} />
                 </div>
                 <div className='px-[40px]  mt-[60px]'>
                     <div className='flex items-center gap-[20px]'>

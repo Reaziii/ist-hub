@@ -37,7 +37,7 @@ export const uploadProfilePicture = async (form: FormData): Promise<ServerMessag
         const buffer = Buffer.from(await file.arrayBuffer());
         const filename = file.name.replaceAll(" ", "_");
         try {
-            let data = await SaveFile(filename, buffer)
+            let data = await cloudinaryImageUploadMethod(buffer)
             if (data.success && data.url) {
                 let sql = `update user set photo = ? where email = ?`
                 await conn.query(sql, [data.url, usr.usr.email])
