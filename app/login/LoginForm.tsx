@@ -35,7 +35,6 @@ const LoginForm: React.FC<{ login: (params: { email: string, password: string })
                 login(values).then(res => {
                     handleToast(res);
                     if (res.success) {
-                        window.document.cookie = `token=${res.token};`
                         localStorage.setItem("token", res.token as string)
                         router.push("/")
                     }
@@ -47,7 +46,6 @@ const LoginForm: React.FC<{ login: (params: { email: string, password: string })
             {({ isSubmitting, handleSubmit, values, handleChange, errors, touched }: FormikProps<LoginProps>) => {
                 return (
                     <section className="bg-gray-50 ">
-                        <ToastContainer />
                         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                             <div className="w-full bg-white rounded-lg shadow  md:mt-0 sm:max-w-md xl:p-0  ">
                                 <div className="p-6 space-y-4 md:space-y-6 sm:p-8">

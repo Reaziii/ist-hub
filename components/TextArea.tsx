@@ -7,14 +7,13 @@ interface InputProps {
     name?: string,
     className?: string,
     error?: string,
-    value?: string,
+    value?: string | number,
     onChange?: ChangeEventHandler,
     id?: string,
-    children: React.ReactNode,
-    show: boolean
+    show: boolean,
 }
 
-const Select = (props: InputProps) => {
+const TextArea = (props: InputProps) => {
     let temp: {
         type?: string,
         placeholder?: string,
@@ -22,20 +21,20 @@ const Select = (props: InputProps) => {
         name?: string,
         className?: string,
         error?: string,
-        value?: string,
+        value?: string | number,
         onChange?: ChangeEventHandler,
         id?: string,
-        show: string | boolean
-    } = {...props };
+        show: boolean | string
+    } = {...props};
+
     temp.show = "nothing"
+
     return (
         <>
-            <select {...temp} className={`bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 :ring-blue-500 :border-blue-500 ${props.className ?? ""}`} >
-                {props.children}
-            </select>
+            <textarea {...temp} className={`bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 :ring-blue-500 :border-blue-500 ${props.className ?? ""} ${props.show && props.error ? "border-red-500 outline-none focus:border-red-500" : ''}`}/>
             <p className="text-red-500 text-[12px] h-[12px]">{props.show ? props.error : ""}</p>
         </>
     )
 }
 
-export default Select
+export default TextArea

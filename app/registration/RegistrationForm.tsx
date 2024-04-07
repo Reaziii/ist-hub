@@ -61,10 +61,8 @@ const RegistrationForm: React.FC<{ handleRegistration: (name: string, email: str
             enableReinitialize
         >
             {({ handleSubmit, isSubmitting, handleChange, values, errors, touched }: FormikProps<RegistrationInterface>) => {
-                console.log("is submitting", isSubmitting)
                 return (
                     <section className="bg-gray-50">
-                        <ToastContainer />
                         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                             <div className="w-full bg-white rounded-lg shadow  md:mt-0 sm:max-w-full xl:p-0  ">
                                 <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -84,7 +82,7 @@ const RegistrationForm: React.FC<{ handleRegistration: (name: string, email: str
                                             <div className='w-[50%]'>
                                                 <label className="block mb-2 text-sm font-medium text-gray-900 ">Your Department</label>
                                                 <Select show={touched.dept ? true : false} name='dept' onChange={handleChange} value={values.dept} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 :ring-blue-500 :border-blue-500">
-                                                    <option value="CSE" selected>CSE</option>
+                                                    <option value="CSE">CSE</option>
                                                     <option value="ECE">ECE</option>
                                                     <option value="BBA">BBA</option>
                                                     <option value="Deploma">DEPLOMA</option>

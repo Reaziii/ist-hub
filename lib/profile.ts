@@ -4,7 +4,8 @@ import path from "path";
 import { user } from "./user";
 import sql from 'mysql2'
 import conn from "./mysql";
-
+import { signNewToken } from "./auth";
+import { cookies } from 'next/headers'
 const SaveFile = async (filename: string, buffer: Buffer): Promise<{ success: boolean, url?: string }> => {
     return new Promise((resolve, reject) => {
         try {
@@ -54,13 +55,11 @@ export const uploadProfilePicture = async (form: FormData): Promise<ServerMessag
     }
 }
 
-export const getProfileDetails = async (): Promise<ServerMessageInterface & { profile?: Profile }> => {
+export const getProfileDetails = async (email:string): Promise<ServerMessageInterface & { profile?: Profile }> => {
     try {
-        let usr = await user();
-        if (!usr.usr) return { success: false, msg: "Unauthorized" }
 
         let sql = `select * from user where email = ?`
-        let data = await conn.query(sql, [usr.usr.email]);
+        let data = await conn.query(sql, [email]);
         if (data.length) {
             let d = data[0] as Profile[];
             if (d.length) {
@@ -72,8 +71,43 @@ export const getProfileDetails = async (): Promise<ServerMessageInterface & { pr
     } catch (err) {
 
 
-
     }
 
     return { success: false, msg: "server error" }
+}
+
+export const updateNameAndBio = async (name: string, bio: string): Promise<ServerMessageInterface & { token?: string }> => {
+    "use server"
+    try {
+        let usr = await user();
+        if (!usr.usr) {
+            return { success: false, msg: "Unauthorized" }
+        }
+        let sql = `update user set fullname = ? , bio = ? where email = ?`;
+        await conn.query(sql, [name, bio, usr.usr?.email]);
+        let token = (await signNewToken()).token
+        cookies().set("token", token as string)
+        return { success: true, msg: "Profile Updated successfully", token }
+    } catch (err) {
+        console.log(err);
+        return { success: false, msg: "Failed to update" }
+    }
+}
+
+export const updateAbout = async (about: string): Promise<ServerMessageInterface & { token?: string }> => {
+    "use server"
+    try {
+        let usr = await user();
+        if (!usr.usr) {
+            return { success: false, msg: "Unauthorized" }
+        }
+        let sql = `update user set about = ? where email = ?`;
+        await conn.query(sql, [about, usr.usr.email]);
+        let token = (await signNewToken()).token
+        cookies().set("token", token as string)
+        return { success: true, msg: "About Updated successfully", token }
+    } catch (err) {
+        console.log(err);
+        return { success: false, msg: "Failed to update" }
+    }
 }

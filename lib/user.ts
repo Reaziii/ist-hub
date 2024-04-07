@@ -1,5 +1,6 @@
 import { cookies } from "next/headers"
 import jwt from 'jsonwebtoken'
+import conn from "./mysql";
 
 export const user = async (): Promise<{ login: boolean, usr?: { name: string, email: string, photo: string, username: string } }> => {
     let token = cookies().get("token");
@@ -30,7 +31,26 @@ export function extractDetails(input: string): { department: string, batch: numb
     }
 }
 
+export const extractEmailAddress = async (username: string): Promise<ServerMessageInterface & { email?: string }> => {
+    try {
+        let details = extractDetails(username);
+        console.log(username)
+        if (!details) throw "";
+        let sql = `select email from user where department = ? and batch = ? and roll_no = ?`
+        let data = await conn.query(sql, [details?.department, details?.batch, details?.rollNumber]) as any[];
+        if (data.length >= 2) {
+            data = data[0] as Array<{ email: string }>;
+            if (data.length >= 1)
+                return { success: true, msg: "Successfully retrived", email: data[0].email }
+        }
+    }
+    catch (err) {
+        console.log(err)
+    }
 
-export const updateProfilePicture = (form:FormData)=>{
-    
+    return { success: false, msg: "Failed to retrive" }
+}
+
+export const updateProfilePicture = (form: FormData) => {
+
 }

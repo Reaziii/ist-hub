@@ -2,3 +2,9 @@
 
 
 select * from user;
+
+ALTER TABLE user
+ADD about varchar(2000);
+
+
+update user set fullname = 'reaz' where email = 'reazahammed.iii@gmail.com';

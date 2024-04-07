@@ -15,7 +15,9 @@ CREATE TABLE IF NOT EXISTS user(
     verified boolean,
     username VARCHAR(20),
     email_verified BOOLEAN,
-    PRIMARY KEY(userid)
+    PRIMARY KEY(userid),
+    bio VARCHAR(255),
+    about VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS education(

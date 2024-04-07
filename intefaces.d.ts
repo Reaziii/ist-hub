@@ -4,5 +4,10 @@ interface ServerMessageInterface {
 }
 
 interface Profile {
-    photo: string
+    photo: string,
+    bio: string,
+    about: string,
+    phone:string,
+    email:string,
+    fullname:string,
 }

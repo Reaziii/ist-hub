@@ -3,6 +3,8 @@ import conn from "./mysql";
 import otpgenerator from 'otp-generator'
 import sendmail from './sendmail'
 import jsonwebtoken from 'jsonwebtoken'
+import { user } from "./user";
+import { cookies } from "next/headers";
 export const registration = async (name: string, email: string, dept: string, batch: number, roll: number, phone: string, pass: string, conPass: string): Promise<{ success: boolean, msg: string }> => {
     "use server";
     try {
@@ -87,16 +89,9 @@ export const login = async (params: { email: string, password: string }): Promis
         if (data[0].length === 0) {
             return { success: false, msg: "Invalid email or password" }
         }
-        let token = jsonwebtoken.sign({
-            name: data[0][0].fullname,
-            email: params.email,
-            photo: data[0][0].photo,
-            roll_no: data[0][0].roll_no,
-            batch: data[0][0].batch,
-            username: data[0][0].username,
-            verified: data[0][0].verified,
-        }, process.env.JWTSECRET ?? "ISTHUB")
-
+        let token = (await signNewToken(params.email)).token;
+        if (!token) throw ""
+        cookies().set('token', token as string)
         return { success: true, msg: "Login successfull", token }
 
     } catch (err) {
@@ -104,6 +99,34 @@ export const login = async (params: { email: string, password: string }): Promis
         return { success: false, msg: "Login failed" }
     }
 }
+
+export const signNewToken = async (email?: string): Promise<{ token?: string }> => {
+    try {
+        if (!email)
+            email = (await user()).usr?.email;
+        if (!email) return {};
+        let sql = `select * from user where email = ? and email_verified = true`
+        let data = await conn.query(sql, [email]) as any[]
+        if (data[0].length === 0) {
+            return {}
+        }
+        let token = jsonwebtoken.sign({
+            name: data[0][0].fullname,
+            email: email,
+            photo: data[0][0].photo,
+            roll_no: data[0][0].roll_no,
+            batch: data[0][0].batch,
+            username: data[0][0].username,
+            verified: data[0][0].verified,
+        }, process.env.JWTSECRET ?? "ISTHUB")
+        return { token }
+
+    } catch (err) {
+
+    }
+    return {};
+}
+
 
 export const forgetpassword = async (form: FormData): Promise<{ success: boolean, msg: string }> => {
     try {

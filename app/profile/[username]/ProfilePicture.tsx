@@ -2,9 +2,8 @@
 import ButtonSpinner from '@/components/ButtonSpinner';
 import handleToast from '@/components/handleToast';
 import React, { useRef, useState } from 'react'
-import { ToastContainer } from 'react-toastify';
 
-const ProfilePicture: React.FC<{ dp: string, uploadImage: (form: FormData) => Promise<ServerMessageInterface & { img?: string }> }> = ({ dp, uploadImage }) => {
+const ProfilePicture: React.FC<{ dp: string, owner: boolean, uploadImage: (form: FormData) => Promise<ServerMessageInterface & { img?: string }> }> = ({ dp, uploadImage, owner }) => {
   const [picture, setPicture] = useState(dp);
   const [loading, setLoading] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null);
@@ -22,26 +21,25 @@ const ProfilePicture: React.FC<{ dp: string, uploadImage: (form: FormData) => Pr
 
     })
   }
-  console.log(dp)
   return (
     <div onClick={() => {
       fileRef.current?.click();
     }} className='h-[200px] w-[200px] bottom-[-50px] left-[50px] rounded-full absolute overflow-hidden flex justify-center items-center bg-white'>
       {
         loading ? <ButtonSpinner /> :
-          <img className='m-h-full m-w-full min-h-full min-w-full' src={picture} alt="" />
+          <img loading='lazy' className='m-h-full m-w-full min-h-full min-w-full' src={picture} alt="" />
       }
-      {/* <div className='h-full w-full absolute bg-white z-10 flex justify-center items-center'>
-        <p className='text-black'>Change</p>
-      </div> */}
-      <input ref={fileRef} type='file' hidden onChange={e => {
-        if (e.target.files?.length && e.target.files[0])
-          handleChange(e.target.files[0])
-      }} />
-
-
-
-      <ToastContainer />
+      {
+        owner && <>
+          <div className='h-full w-full absolute bg-[#00000098] z-5 opacity-0 hover:opacity-100 transition-all flex justify-center items-center cursor-pointer rounded-full'>
+            <p className='text-white uppercase font-bold cursor-pointer'>Change</p>
+          </div>
+          <input ref={fileRef} type='file' hidden onChange={e => {
+            if (e.target.files?.length && e.target.files[0])
+              handleChange(e.target.files[0])
+          }} />
+        </>
+      }
     </div>
   )
 }
