@@ -55,7 +55,7 @@ export const uploadProfilePicture = async (form: FormData): Promise<ServerMessag
     }
 }
 
-export const getProfileDetails = async (email:string): Promise<ServerMessageInterface & { profile?: Profile }> => {
+export const getProfileDetails = async (email: string): Promise<ServerMessageInterface & { profile?: Profile }> => {
     try {
 
         let sql = `select * from user where email = ?`
@@ -109,5 +109,165 @@ export const updateAbout = async (about: string): Promise<ServerMessageInterface
     } catch (err) {
         console.log(err);
         return { success: false, msg: "Failed to update" }
+    }
+}
+
+export const addNewEducation = async (params: EducationInterface): Promise<ServerMessageInterface> => {
+    "use server"
+    try {
+        let usr = await user();
+        if (!usr || !usr.login || !usr.usr) return { success: false, msg: "Unauthorized" }
+        let sql = `select userid from user where email = ?`
+        let data = await conn.query(sql, [usr.usr.email]) as any[];
+        if (data.length >= 2) {
+            let userid = data[0][0].userid;
+            sql = `insert into education(userid, start_date, end_date, grade, school, degree, still) values(?,?,?,?,?,?, ?)`
+            data = await conn.query(sql, [userid, params.start_date, params.end_date, params.grade, params.school, params.degree, params.still])
+            return { success: true, msg: "Successfully added" }
+        }
+    }
+    catch (err) {
+        console.log("[add new education]", err)
+    }
+
+
+
+    return { success: false, msg: "Failed to add" }
+}
+
+
+export const getEducations = async (email: string): Promise<ServerMessageInterface & { educations?: EducationInterface[] }> => {
+    "use server"
+    try {
+        let sql = `
+            SELECT e.*
+            FROM education e
+            INNER JOIN user u ON e.userid = u.userid
+            WHERE u.email = ?
+            ORDER BY e.start_date DESC
+            ;
+        `
+        let data = (await conn.query(sql, [email]))[0] as EducationInterface[];
+
+        return { success: true, msg: "Education retrived", educations: data }
+
+
+    }
+    catch (err) {
+        console.log(err);
+    }
+
+
+    return { success: false, msg: "Couldn't retrived educations" }
+
+
+}
+
+export const updateAnEducation = async (params: EducationInterface): Promise<ServerMessageInterface> => {
+    "use server"
+    try {
+        let sql = `update education set degree = ? , school = ?, start_date= ? , end_date = ?, grade = ?, still = ? where edu_id = ?`;
+        await conn.query(sql, [params.degree, params.school, params.start_date, params.end_date, params.grade, params.still, params.edu_id]);
+        return { success: true, msg: "Education updated successfully" }
+    }
+    catch (err) {
+        console.log(err)
+        return { success: false, msg: "Failed to update!" }
+    }
+}
+
+export const deleteAnEduItem = async (id: number): Promise<ServerMessageInterface> => {
+    "use server";
+    try {
+        let sql = `delete from education where edu_id = ?`;
+        await conn.query(sql, [id])
+        return { success: true, msg: "Successfully Deleted" }
+    } catch (err) {
+        return { success: false, msg: "Failed to delete" }
+    }
+}
+
+export const addNewExperience = async (params: ExperieneInterfaces): Promise<ServerMessageInterface> => {
+    "use server"
+    try {
+        const usr = await user();
+        if (!usr.usr) return { success: false, msg: "Unauthorized" }
+        let sql = `select userid from user where email = ?`
+        let data = await conn.query(sql, [usr.usr.email]) as any[];
+        if (data.length >= 2) {
+            let userid = data[0][0].userid;
+            sql = `insert into experience(userid, title, employee_type, position, company_name, start_date, end_date, location, still) values(?,?,?,?,?,?,?,?)`;
+            data = await conn.query(sql, [userid, params.title, params.employee_type, params.positioin, params.company_name, params.start_date.toString(), params.end_date?.toString(), params.location, params.still])
+            return { success: true, msg: "Successfully added" }
+        }
+
+    } catch (err) {
+        console.log(err);
+    }
+
+    return { success: false, msg: "Failed to add new experience" }
+}
+
+
+export const getExperiences = async (email: string): Promise<ServerMessageInterface & { experiences?: ExperieneInterfaces[] }> => {
+    "use server"
+    try {
+        let sql = `
+            SELECT e.*
+            FROM experience e
+            INNER JOIN user u ON e.userid = u.userid
+            WHERE u.email = ?
+            ORDER BY e.start_date DESC
+            ;
+        `
+        let data = (await conn.query(sql, [email]))[0] as ExperieneInterfaces[];
+
+        return { success: true, msg: "Education retrived", experiences: data }
+
+
+    }
+    catch (err) {
+        console.log(err);
+    }
+
+
+    return { success: false, msg: "Couldn't retrived educations" }
+
+
+}
+
+
+
+export const updateAnExperience = async (params: ExperieneInterfaces): Promise<ServerMessageInterface> => {
+    "use server"
+    console.log(params)
+    try {
+        const usr = await user();
+        if (!usr.usr) return { success: false, msg: "Unauthorized" }
+        let sql = `select userid from user where email = ?`
+        let data = await conn.query(sql, [usr.usr.email]) as any[];
+        if (data.length >= 2) {
+            let userid = data[0][0].userid;
+            sql = `update experience set title = ? , employee_type = ?, company_name = ?, start_date = ?, end_date = ?, location = ?, still = ? where userid = ? and exp_id = ?`;
+            data = await conn.query(sql, [params.title, params.employee_type, params.company_name, params.start_date.toString(), params.end_date?.toString(), params.location, params.still, userid, params.exp_id])
+            return { success: true, msg: "Experience updated succesfully" }
+        }
+    }
+    catch (err) {
+        console.log(err)
+    }
+    return { success: false, msg: "Failed to update!" }
+
+}
+
+
+export const deleteAnExperienceItem = async (id: number): Promise<ServerMessageInterface> => {
+    "use server";
+    try {
+        let sql = `delete from experience where exp_id = ?`;
+        await conn.query(sql, [id])
+        return { success: true, msg: "Successfully Deleted" }
+    } catch (err) {
+        return { success: false, msg: "Failed to delete" }
     }
 }

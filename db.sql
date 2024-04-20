@@ -1,4 +1,4 @@
--- Active: 1710972936505@@ist-linkedin.c1gqwxxyqcc1.ap-southeast-1.rds.amazonaws.com@null@ist_hub
+-- Active: 1712913441556@@ist-linkedin.c1gqwxxyqcc1.ap-southeast-1.rds.amazonaws.com@null@ist_hub
 
 create DATABASE ist_hub;
 
@@ -22,12 +22,14 @@ CREATE TABLE IF NOT EXISTS user(
 
 CREATE TABLE IF NOT EXISTS education(
     userid int NOT NULL,
+    edu_id int NOT NULL auto_increment,
     start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
+    end_date DATE,
     grade FLOAT(2,2) NOT NULL,
-    degree varchar(20) NOT NULL,
+    degree varchar(100) NOT NULL,
     school varchar(100) NOT NULL,
-    FOREIGN KEY (userid) REFERENCES user(userid)
+    FOREIGN KEY (userid) REFERENCES user(userid),
+    PRIMARY KEY(edu_id)
 );
 
 CREATE TABLE IF NOT EXISTS projects(
@@ -45,18 +47,18 @@ CREATE TABLE IF NOT EXISTS project_tech(
     techname varchar(50) NOT NULL,
     FOREIGN KEY (projectid) REFERENCES projects(projectid)
 );
-
-CREATE TABLE IF NOT EXISTS experiance(
+CREATE TABLE IF NOT EXISTS experience(
     userid int NOT NULL,
-    experianceid int NOT NULL AUTO_INCREMENT,
+    exp_id int NOT NULL AUTO_INCREMENT,
     title varchar(100) NOT NULL,
     employee_type varchar(100) NOT NULL,
     position varchar(100) NOT NULL,
     company_name varchar(200) NOT NULL,
     start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
-    PRIMARY KEY(experianceid),
-    FOREIGN KEY (userid) REFERENCES user(userid)
+    end_date DATE,
+    PRIMARY KEY(exp_id),
+    FOREIGN KEY (userid) REFERENCES user(userid),
+    location VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS experiance_tech(
