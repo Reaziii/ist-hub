@@ -9,11 +9,12 @@ import ButtonSpinner from '@/components/ButtonSpinner'
 const Education: FC<
     {
         email: string,
+        owner: boolean,
         update: (params: EducationInterface) => Promise<ServerMessageInterface>,
         getEducations?: (email: string) => Promise<ServerMessageInterface & { educations?: EducationInterface[] }>,
         addNewEducation: (params: EducationInterface) => Promise<ServerMessageInterface>,
         deleteItem: (id: number) => Promise<ServerMessageInterface>
-    }> = ({ email, addNewEducation, getEducations, update, deleteItem }) => {
+    }> = ({ email, addNewEducation, getEducations, update, deleteItem, owner }) => {
         let [educations, setEducations] = useState<EducationInterface[]>([])
         const [loading, setLoading] = useState(true);
         let [openUpdateModal, setOpenUpdateModal] = useState<EducationInterface & { open: null | number }>({
@@ -103,7 +104,9 @@ const Education: FC<
                                 ))
                         }
                     </div>
-                    <AddEducation add={_handleAdd} />
+                    {
+                        owner ? <AddEducation add={_handleAdd} /> : null
+                    }
                 </div>
             </div>
         )

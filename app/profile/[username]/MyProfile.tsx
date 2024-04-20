@@ -54,8 +54,8 @@ const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
                     </div>
                 </div>
                 <About owner={owner} about={about} update={updateAbout} />
-                <Education deleteItem={deleteAnEduItem} update={updateAnEducation} addNewEducation={addNewEducation} getEducations={getEducations} email={profile.profile.email} />
-                <Experience deleteItem={deleteAnExperienceItem} getExperinces={getExperiences} email={profile.profile.email} addNewExperience={addNewExperience} update={updateAnExperience} />
+                <Education owner={owner} deleteItem={deleteAnEduItem} update={updateAnEducation} addNewEducation={addNewEducation} getEducations={getEducations} email={profile.profile.email} />
+                <Experience owner={owner} deleteItem={deleteAnExperienceItem} getExperinces={getExperiences} email={profile.profile.email} addNewExperience={addNewExperience} update={updateAnExperience} />
             </div>
         </div>
     )

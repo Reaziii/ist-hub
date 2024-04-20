@@ -166,14 +166,22 @@ export const getEducations = async (email: string): Promise<ServerMessageInterfa
 export const updateAnEducation = async (params: EducationInterface): Promise<ServerMessageInterface> => {
     "use server"
     try {
-        let sql = `update education set degree = ? , school = ?, start_date= ? , end_date = ?, grade = ?, still = ? where edu_id = ?`;
-        await conn.query(sql, [params.degree, params.school, params.start_date, params.end_date, params.grade, params.still, params.edu_id]);
-        return { success: true, msg: "Education updated successfully" }
+        const usr = await user();
+        if (!usr.usr) return { success: false, msg: "Unauthorized" }
+        let sql = `select userid from user where email = ?`
+        let data = await conn.query(sql, [usr.usr.email]) as any[]
+        if (data.length >= 2) {
+            let userid = data[0][0].userid;
+            sql = `update education set degree = ? , school = ?, start_date= ? , end_date = ?, grade = ?, still = ? where edu_id = ? and userid = ?`;
+            await conn.query(sql, [params.degree, params.school, params.start_date, params.end_date, params.grade, params.still, params.edu_id, userid]);
+            return { success: true, msg: "Education updated successfully" }
+        }
     }
     catch (err) {
         console.log(err)
-        return { success: false, msg: "Failed to update!" }
     }
+    return { success: false, msg: "Failed to update!" }
+
 }
 
 export const deleteAnEduItem = async (id: number): Promise<ServerMessageInterface> => {
@@ -240,7 +248,6 @@ export const getExperiences = async (email: string): Promise<ServerMessageInterf
 
 export const updateAnExperience = async (params: ExperieneInterfaces): Promise<ServerMessageInterface> => {
     "use server"
-    console.log(params)
     try {
         const usr = await user();
         if (!usr.usr) return { success: false, msg: "Unauthorized" }

@@ -9,11 +9,12 @@ import UpdateExperience from './UpdateExperience'
 const Experience: FC<
     {
         email: string,
+        owner: boolean,
         update: (params: ExperieneInterfaces) => Promise<ServerMessageInterface>,
         getExperinces: (email: string) => Promise<ServerMessageInterface & { experiences?: ExperieneInterfaces[] }>,
         addNewExperience: (params: ExperieneInterfaces) => Promise<ServerMessageInterface>,
         deleteItem: (id: number) => Promise<ServerMessageInterface>
-    }> = ({ email, getExperinces, addNewExperience, update, deleteItem }) => {
+    }> = ({ email, getExperinces, addNewExperience, update, deleteItem, owner }) => {
         let [experiences, setExperiences] = useState<ExperieneInterfaces[]>([])
         const [loading, setLoading] = useState(true);
         let [openUpdateModal, setOpenUpdateModal] = useState<ExperieneInterfaces & { open: null | number }>({
@@ -108,7 +109,9 @@ const Experience: FC<
                                 ))
                         }
                     </div>
-                    <AddExperience add={_handleAdd} />
+                    {
+                        owner ? <AddExperience add={_handleAdd} /> : null
+                    }
                 </div>
             </div>
         )
