@@ -23,7 +23,6 @@ export const registration = async (name: string, email: string, dept: string, ba
         let sql = "select * from user where email_verified = ? and (email = ? or roll_no = ? or phone = ?)";
 
         let data = await conn.query(sql, [true, email, roll, phone]) as any[];
-        console.log(data)
         if (data[0].length >= 1) {
             return { success: false, msg: "email or roll or phone already exists" }
         }
@@ -118,6 +117,7 @@ export const signNewToken = async (email?: string): Promise<{ token?: string }> 
             batch: data[0][0].batch,
             username: data[0][0].username,
             verified: data[0][0].verified,
+            userid: data[0][0].userid
         }, process.env.JWTSECRET ?? "ISTHUB")
         return { token }
 

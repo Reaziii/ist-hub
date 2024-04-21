@@ -5,10 +5,11 @@ import { MdOutlineAlternateEmail } from "react-icons/md";
 import About from './About';
 import Education from './Education/Education';
 import ProfilePicture from './ProfilePicture';
-import { addNewEducation, getEducations, getProfileDetails, updateAbout, updateAnEducation, updateNameAndBio, uploadProfilePicture, deleteAnEduItem, getExperiences, addNewExperience, updateAnExperience, deleteAnExperienceItem } from '@/lib/profile';
+import { addNewEducation, getEducations, getProfileDetails, updateAbout, updateAnEducation, updateNameAndBio, uploadProfilePicture, deleteAnEduItem, getExperiences, addNewExperience, updateAnExperience, deleteAnExperienceItem, uploadResume } from '@/lib/profile';
 import MainProfileEdit from './MainProfileEdit';
 import { redirect } from 'next/navigation';
 import Experience from './Experience/Experience';
+import Resume from './Resume';
 
 const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
     let usr = await user();
@@ -32,6 +33,7 @@ const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
                         backgroundSize: 'cover',
                         backgroundRepeat: "no-repeat",
                     }} className='w-full h-[200px]  relative z-5'>
+                        <Resume owner={owner} resume={profile.profile.resume} upload={uploadResume} />
                         <ProfilePicture owner={owner} uploadImage={uploadProfilePicture} dp={profile.profile?.photo ?? ""} />
                     </div>
                     <div className='px-[40px]  pt-[60px] relative'>
@@ -39,7 +41,7 @@ const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
                             <h1 className='font-bold text-[24px]'>{profile.profile.fullname}</h1><FaCheckCircle size={20} color='lightgray' />
                         </div>
                         <div className='flex'>
-                            <p className='text-[16px] w-[60%]'>
+                            <p className='text-[16px] w-[60%] flex flex-col'>
                                 {profile.profile?.bio ?? ""}
                             </p>
                             <div className="flex flex-col items-end w-[40%]">

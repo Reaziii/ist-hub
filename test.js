@@ -4,6 +4,6 @@ const getData = async () => {
 
 }
 
-getData().then((result)=>{
-    console.log(result)
-})
+// getData().then((result)=>{
+//     console.log(result)
+// })

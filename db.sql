@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS user(
     email_verified BOOLEAN,
     PRIMARY KEY(userid),
     bio VARCHAR(255),
-    about VARCHAR(255)
+    about VARCHAR(255),
+    resume VARCHAR(100)
 );
 
 CREATE TABLE IF NOT EXISTS education(

@@ -58,13 +58,11 @@ const Education: FC<
 
         const _handleUpdate = async (params: EducationInterface) => {
             let res = await update(params)
-            console.log("asdfasdf", res)
             handleToast(res);
             await handleRetrive();
         }
         const _handleAdd = async (params: EducationInterface) => {
             params.edu_id = openUpdateModal.edu_id
-            console.log("pppp", params)
             let res = await addNewEducation(params);
             handleToast(res);
             await handleRetrive();
@@ -76,7 +74,6 @@ const Education: FC<
             await handleRetrive();
 
         }
-        console.log(educations)
         return (
             <div>
                 {openUpdateModal.open !== null ? <UpdateEducation update={_handleUpdate} close={() => setOpenUpdateModal({ ...openUpdateModal, open: null })} values={{ ...openUpdateModal }} deleteItem={handleDelete} /> : null}

@@ -7,17 +7,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_SECRET_KEY
 });
 
-const multerStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, './uploads/')
-  },
-  filename: (_req, file, cb) => {
-    const ext = file.mimetype.split('/')[1]
-    cb(null, `${Date.now()}.${ext}`)
-  },
-})
-
-const upload = multer({ storage: multerStorage })
 
 
 export const cloudinaryImageUploadMethod = async (file: Buffer): Promise<{ success: boolean, url?: string, msg?: string }> => {

@@ -20,6 +20,7 @@ interface Profile {
     phone: string,
     email: string,
     fullname: string,
+    resume: string | null,
 }
 
 interface ExperieneInterfaces {

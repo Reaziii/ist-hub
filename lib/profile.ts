@@ -36,7 +36,6 @@ export const uploadProfilePicture = async (form: FormData): Promise<ServerMessag
             return { success: false, msg: "File is required" }
         }
         const buffer = Buffer.from(await file.arrayBuffer());
-        const filename = file.name.replaceAll(" ", "_");
         try {
             let data = await cloudinaryImageUploadMethod(buffer)
             if (data.success && data.url) {
@@ -277,4 +276,24 @@ export const deleteAnExperienceItem = async (id: number): Promise<ServerMessageI
     } catch (err) {
         return { success: false, msg: "Failed to delete" }
     }
+}
+
+export const uploadResume = async (form: FormData): Promise<ServerMessageInterface> => {
+    "use server"
+    let file = form.get("file") as File;
+    try {
+        let usr = await user();
+        if (!usr.usr) return { success: false, msg: "Unauthorized" }
+        const buffer = Buffer.from(await file.arrayBuffer());
+        let _ = await cloudinaryImageUploadMethod(buffer)
+        if (!_.success) throw "";
+        let sql = 'update user set resume = ? where userid = ?'
+        await conn.query(sql, [_.url, usr.usr.userid])
+        return { success: true, msg: "Resume uploaded successfully" }
+
+
+    } catch (err) {
+        console.log(err);
+    }
+    return { success: false, msg: "Failed to upload resume" }
 }

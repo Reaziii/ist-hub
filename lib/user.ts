@@ -2,11 +2,11 @@ import { cookies } from "next/headers"
 import jwt from 'jsonwebtoken'
 import conn from "./mysql";
 
-export const user = async (): Promise<{ login: boolean, usr?: { name: string, email: string, photo: string, username: string } }> => {
+export const user = async (): Promise<{ login: boolean, usr?: { name: string, email: string, photo: string, username: string, userid: number } }> => {
     let token = cookies().get("token");
     try {
         if (!token) throw "";
-        let details = jwt.verify(token.value, process.env.JWTSECRET ?? "ISTHUB") as { name: string, email: string, photo: string, username: string };
+        let details = jwt.verify(token.value, process.env.JWTSECRET ?? "ISTHUB") as { name: string, email: string, photo: string, username: string, userid: number };
         return { login: true, usr: details }
     }
     catch (err) {
@@ -34,7 +34,6 @@ export function extractDetails(input: string): { department: string, batch: numb
 export const extractEmailAddress = async (username: string): Promise<ServerMessageInterface & { email?: string }> => {
     try {
         let details = extractDetails(username);
-        console.log(username)
         if (!details) throw "";
         let sql = `select email from user where department = ? and batch = ? and roll_no = ?`
         let data = await conn.query(sql, [details?.department, details?.batch, details?.rollNumber]) as any[];
