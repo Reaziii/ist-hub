@@ -1,35 +1,17 @@
-import { writeFile } from "fs";
+
 import { cloudinaryImageUploadMethod } from "./upload";
-import path from "path";
 import { user } from "./user";
-import sql from 'mysql2'
 import conn from "./mysql";
 import { signNewToken } from "./auth";
 import { cookies } from 'next/headers'
-const SaveFile = async (filename: string, buffer: Buffer): Promise<{ success: boolean, url?: string }> => {
-    return new Promise((resolve, reject) => {
-        try {
-            writeFile(
-                path.join(process.cwd(), "public/profilepictures/" + filename),
-                buffer,
-                (err) => {
-                    console.log(err)
-                    if (err) reject({ success: false, msg: "failed to save" })
-                    resolve({ success: true, url: "/profilepictures/" + filename })
-                }
-            );
-        } catch (err) {
-            reject()
-        }
-    })
-}
+import { ErrorMessage } from "@/constants";
 
 export const uploadProfilePicture = async (form: FormData): Promise<ServerMessageInterface & { img?: string }> => {
     "use server"
     try {
         const usr = await user();
         if (!usr.usr) {
-            return { success: false, msg: "Unauthorzied" }
+            return ErrorMessage.UNAUTHORIZED;
         }
         const file = form.get("file") as File;
         if (!file) {
@@ -80,7 +62,7 @@ export const updateNameAndBio = async (name: string, bio: string): Promise<Serve
     try {
         let usr = await user();
         if (!usr.usr) {
-            return { success: false, msg: "Unauthorized" }
+            return ErrorMessage.UNAUTHORIZED;
         }
         let sql = `update user set fullname = ? , bio = ? where email = ?`;
         await conn.query(sql, [name, bio, usr.usr?.email]);
@@ -98,7 +80,7 @@ export const updateAbout = async (about: string): Promise<ServerMessageInterface
     try {
         let usr = await user();
         if (!usr.usr) {
-            return { success: false, msg: "Unauthorized" }
+            return ErrorMessage.UNAUTHORIZED;
         }
         let sql = `update user set about = ? where email = ?`;
         await conn.query(sql, [about, usr.usr.email]);
@@ -115,7 +97,7 @@ export const addNewEducation = async (params: EducationInterface): Promise<Serve
     "use server"
     try {
         let usr = await user();
-        if (!usr || !usr.login || !usr.usr) return { success: false, msg: "Unauthorized" }
+        if (!usr || !usr.login || !usr.usr) return ErrorMessage.UNAUTHORIZED;
         let sql = `select userid from user where email = ?`
         let data = await conn.query(sql, [usr.usr.email]) as any[];
         if (data.length >= 2) {
@@ -166,7 +148,7 @@ export const updateAnEducation = async (params: EducationInterface): Promise<Ser
     "use server"
     try {
         const usr = await user();
-        if (!usr.usr) return { success: false, msg: "Unauthorized" }
+        if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
         let sql = `select userid from user where email = ?`
         let data = await conn.query(sql, [usr.usr.email]) as any[]
         if (data.length >= 2) {
@@ -198,7 +180,7 @@ export const addNewExperience = async (params: ExperieneInterfaces): Promise<Ser
     "use server"
     try {
         const usr = await user();
-        if (!usr.usr) return { success: false, msg: "Unauthorized" }
+        if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
         let sql = `select userid from user where email = ?`
         let data = await conn.query(sql, [usr.usr.email]) as any[];
         if (data.length >= 2) {
@@ -249,7 +231,7 @@ export const updateAnExperience = async (params: ExperieneInterfaces): Promise<S
     "use server"
     try {
         const usr = await user();
-        if (!usr.usr) return { success: false, msg: "Unauthorized" }
+        if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
         let sql = `select userid from user where email = ?`
         let data = await conn.query(sql, [usr.usr.email]) as any[];
         if (data.length >= 2) {
@@ -283,7 +265,7 @@ export const uploadResume = async (form: FormData): Promise<ServerMessageInterfa
     let file = form.get("file") as File;
     try {
         let usr = await user();
-        if (!usr.usr) return { success: false, msg: "Unauthorized" }
+        if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
         const buffer = Buffer.from(await file.arrayBuffer());
         let _ = await cloudinaryImageUploadMethod(buffer)
         if (!_.success) throw "";
@@ -296,4 +278,46 @@ export const uploadResume = async (form: FormData): Promise<ServerMessageInterfa
         console.log(err);
     }
     return { success: false, msg: "Failed to upload resume" }
+}
+
+export const addNewSkill = async (skill: string): Promise<ServerMessageInterface> => {
+    "use server"
+    try {
+        let usr = await user();
+        if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
+        let sql = `insert into skills(skill, userid) values(?,?)`
+        await conn.query(sql, [skill, usr.usr.userid]);
+        return { success: true, msg: "Skill added successfully" }
+    }
+    catch (err) {
+        console.log(err);
+    }
+    return { success: false, msg: "Failed to upload" }
+}
+export const getSkills = async (userid: number): Promise<ServerMessageInterface & { skills: SkillInterface[] }> => {
+    "use server"
+    try {
+        let sql = `select * from skills where userid = ?`;
+        let data = (await conn.query(sql, [userid]))[0] as SkillInterface[];
+        return { success: true, msg: "Education retrived", skills: data }
+
+    } catch (err) {
+
+    }
+    return { success: false, msg: "Failed to retrive skills", skills: [] }
+}
+export const deleteASkill = async (skill_id: number): Promise<ServerMessageInterface> => {
+    "use server"
+    try {
+        let usr = await user();
+        if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
+        let sql = `delete from skills where userid = ? and skill_id = ?`;
+        await conn.query(sql, [usr.usr.userid, skill_id])
+        return { success: true, msg: "Skill deleted successfully" }
+
+    } catch (err) {
+        console.log(err);
+
+    }
+    return { success: false, msg: "Failed to delete" }
 }

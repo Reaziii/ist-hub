@@ -6,3 +6,6 @@ export enum EmployeeType {
     FREELANCE = 'Freelance'
 }
 
+export const ErrorMessage = {
+    UNAUTHORIZED: { success: false, msg: "" }
+}

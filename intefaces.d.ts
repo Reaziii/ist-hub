@@ -21,6 +21,7 @@ interface Profile {
     email: string,
     fullname: string,
     resume: string | null,
+    userid: number;
 }
 
 interface ExperieneInterfaces {
@@ -33,4 +34,10 @@ interface ExperieneInterfaces {
     end_date?: string | null,
     location: string,
     still: boolean
+}
+
+interface SkillInterface{
+    userid : number;
+    skill: string;
+    skill_id : number;
 }

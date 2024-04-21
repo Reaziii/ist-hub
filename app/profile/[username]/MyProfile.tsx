@@ -5,11 +5,12 @@ import { MdOutlineAlternateEmail } from "react-icons/md";
 import About from './About';
 import Education from './Education/Education';
 import ProfilePicture from './ProfilePicture';
-import { addNewEducation, getEducations, getProfileDetails, updateAbout, updateAnEducation, updateNameAndBio, uploadProfilePicture, deleteAnEduItem, getExperiences, addNewExperience, updateAnExperience, deleteAnExperienceItem, uploadResume } from '@/lib/profile';
+import { addNewEducation, getEducations, getProfileDetails, updateAbout, updateAnEducation, updateNameAndBio, uploadProfilePicture, deleteAnEduItem, getExperiences, addNewExperience, updateAnExperience, deleteAnExperienceItem, uploadResume, addNewSkill, getSkills, deleteASkill } from '@/lib/profile';
 import MainProfileEdit from './MainProfileEdit';
 import { redirect } from 'next/navigation';
 import Experience from './Experience/Experience';
 import Resume from './Resume';
+import Skill from './skills/Skill';
 
 const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
     let usr = await user();
@@ -23,7 +24,13 @@ const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
     }
     const about = `${profile.profile.about ?? ""}`
     const owner = usr.usr?.email !== null && usr.usr?.email === details.email;
+    const handleGetSkills = async (): Promise<ServerMessageInterface & { skills: SkillInterface[] }> => {
+        "use server"
+        if (profile.profile)
+            return await getSkills(profile.profile?.userid)
+        return { success: false, msg: "Profile doesn't exists", skills: [] }
 
+    }
     return (
         <div>
             <div className='w-full px-[40px] box-border'>
@@ -58,6 +65,7 @@ const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
                 <About owner={owner} about={about} update={updateAbout} />
                 <Education owner={owner} deleteItem={deleteAnEduItem} update={updateAnEducation} addNewEducation={addNewEducation} getEducations={getEducations} email={profile.profile.email} />
                 <Experience owner={owner} deleteItem={deleteAnExperienceItem} getExperinces={getExperiences} email={profile.profile.email} addNewExperience={addNewExperience} update={updateAnExperience} />
+                <Skill add={addNewSkill} getSkills={handleGetSkills} deleteItem={deleteASkill} />
             </div>
         </div>
     )
