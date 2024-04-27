@@ -7,7 +7,6 @@ const Profile: React.FC<{ params: { username: string } }> = async ({ params: { u
             <Header />
             <div className='h-[60px] w-full' />
             <MyProfile username={username} />
-
         </div>
     )
 }

@@ -84,7 +84,7 @@ const Experience: FC<
                 <div className='border border-[#ccc] mt-[20px] rounded-lg p-[40px] overflow-hidden bg-white relative'>
                     {openUpdateModal.open !== null ? <UpdateExperience update={_handleUpdate} close={() => setOpenUpdateModal({ ...openUpdateModal, open: null })} values={{ ...openUpdateModal }} deleteItem={handleDelete} /> : null}
 
-                    <h1 className='font-bold text-[20px]'>Education</h1>
+                    <h1 className='font-bold text-[20px]'>Experience</h1>
                     <div>
                         {
                             loading ? <div className='h-[100px] w-full flex items-center justify-center'>

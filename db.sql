@@ -86,3 +86,9 @@ CREATE TABLE IF NOT EXISTS email_verification(
 )
 
 
+CREATE TABLE IF NOT EXISTS skills(
+    userid int NOT NULL,
+    skill VARCHAR(100) NOT NULL,
+    skill_id INT NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY(skill_id)
+)
