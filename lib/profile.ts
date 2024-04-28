@@ -176,8 +176,10 @@ export const deleteAnEduItem = async (id: number): Promise<ServerMessageInterfac
     }
 }
 
+
 export const addNewExperience = async (params: ExperieneInterfaces): Promise<ServerMessageInterface> => {
     "use server"
+    console.log(params)
     try {
         const usr = await user();
         if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
@@ -185,7 +187,7 @@ export const addNewExperience = async (params: ExperieneInterfaces): Promise<Ser
         let data = await conn.query(sql, [usr.usr.email]) as any[];
         if (data.length >= 2) {
             let userid = data[0][0].userid;
-            sql = `insert into experience(userid, title, employee_type, position, company_name, start_date, end_date, location, still) values(?,?,?,?,?,?,?,?)`;
+            sql = `insert into experience(userid, title, employee_type, position, company_name, start_date, end_date, location, still) values(?,?,?,?,?,?,?,?,?)`;
             data = await conn.query(sql, [userid, params.title, params.employee_type, params.positioin, params.company_name, params.start_date.toString(), params.end_date?.toString(), params.location, params.still])
             return { success: true, msg: "Successfully added" }
         }
@@ -320,4 +322,14 @@ export const deleteASkill = async (skill_id: number): Promise<ServerMessageInter
 
     }
     return { success: false, msg: "Failed to delete" }
+}
+
+
+
+export const addNewShowcase = (name:string) =>{
+    try{
+        
+    }catch(err){
+
+    }
 }

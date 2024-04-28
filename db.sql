@@ -92,3 +92,9 @@ CREATE TABLE IF NOT EXISTS skills(
     skill_id INT NOT NULL AUTO_INCREMENT,
     PRIMARY KEY(skill_id)
 )
+
+CREATE TABLE IF NOT EXISTS showcase(
+    userid int NOT NULL,
+    showcase_id int NOT NULL AUTO_INCREMENT,
+    
+)
