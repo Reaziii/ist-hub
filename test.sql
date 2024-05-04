@@ -13,7 +13,7 @@ ADD grade FLOAT;
 update user set fullname = 'reaz' where email = 'reazahammed.iii@gmail.com';
 
 select * from experience;
-
+delete from showcase;
 Alter TABLE user
 add COLUMN  resume VARCHAR(100);
 
@@ -22,7 +22,7 @@ add COLUMN  resume VARCHAR(100);
 drop table experience;
 drop table experiance_tech;
 
-select * from experience;
+select * from showcase;
 
 
 update education set still = TRUE;

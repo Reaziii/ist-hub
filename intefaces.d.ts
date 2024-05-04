@@ -36,8 +36,18 @@ interface ExperieneInterfaces {
     still: boolean
 }
 
-interface SkillInterface{
-    userid : number;
+interface SkillInterface {
+    userid: number;
     skill: string;
-    skill_id : number;
+    skill_id: number;
+}
+
+interface ShowcaseVerifierDetails {
+    email: string,
+    showcase_id: number,
+    verified: boolean,
+    name: string,
+    company: string,
+    mailSent: boolean,
+    title:string
 }

@@ -94,7 +94,38 @@ CREATE TABLE IF NOT EXISTS skills(
 )
 
 CREATE TABLE IF NOT EXISTS showcase(
-    userid int NOT NULL,
     showcase_id int NOT NULL AUTO_INCREMENT,
-    
+    userid int NOT NULL,
+    name VARCHAR(250) not NULL,
+    description VARCHAR(2000) not NULL,
+    Foreign Key (userid) REFERENCES user(userid),
+    PRIMARY KEY (showcase_id)
 )
+
+CREATE TABLE IF NOT EXISTS showcaseTags(
+    showcase_id int NOT NULL,
+    tag VARCHAR(20) NOT NULL,
+    Foreign Key (showcase_id) REFERENCES showcase(showcase_id)
+)
+
+CREATE TABLE IF NOT EXISTS showcase_verifier(
+    showcase_id int NOT NULL,
+    email VARCHAR(40) not NULL,
+    Foreign Key (showcase_id) REFERENCES showcase(showcase_id)
+)
+
+CREATE TABLE IF NOT EXISTS showcase_verfier_details(
+    email VARCHAR(40) not NULL,
+    showcase_id int NOT NULL,
+    Foreign Key (showcase_id) REFERENCES showcase(showcase_id),
+    verified BOOLEAN DEFAULT false,
+    name VARCHAR(40),
+    title VARCHAR(40),
+    company VARCHAR(40),
+    mailSent BOOLEAN DEFAULT false,
+    UNIQUE(email, showcase_id)
+)
+
+
+drop table showcase_verfier_details;
+
