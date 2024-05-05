@@ -150,8 +150,6 @@ export const forgetpassword = async (form: FormData): Promise<{ success: boolean
         let mail = new sendmail(email as string, "Email Verification - IST HUB", `Your verification code is - ${otp}`)
         await mail.send();
         return { success: true, msg: "OTP has been sent" }
-
-
     } catch (err) {
         console.log('[forgetpassword failed]====>\n', err)
         return { success: false, msg: "Server error!" }
