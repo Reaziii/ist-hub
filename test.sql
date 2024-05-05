@@ -1,7 +1,9 @@
--- Active: 1712913441556@@ist-linkedin.c1gqwxxyqcc1.ap-southeast-1.rds.amazonaws.com@null@ist_hub
+-- Active: 1714933239682@@127.0.0.1@3307@ist-hub
 
 
 select * from user;
+
+ALTER Table `user` DROP COLUMN about;
 
 ALTER TABLE user
 ADD COLUMN about varchar(2000);
@@ -26,3 +28,15 @@ select * from showcase;
 
 
 update education set still = TRUE;
+
+drop table email_verification;
+
+ALTER TABLE user
+MODIFY 
+MODIFY COLU
+MOD
+COLUMN about VARCHAR(2000);
+
+ALTER TABLE education add column still BOOLEAN
+
+ALTER TABLE education add COLUMN grade DECIMAL(2,2);

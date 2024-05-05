@@ -1,4 +1,4 @@
--- Active: 1712913441556@@ist-linkedin.c1gqwxxyqcc1.ap-southeast-1.rds.amazonaws.com@null@ist_hub
+-- Active: 1714933239682@@127.0.0.1@3307@ist-hub
 
 create DATABASE ist_hub;
 
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS user(
     email_verified BOOLEAN,
     PRIMARY KEY(userid),
     bio VARCHAR(255),
-    about VARCHAR(255),
+    about VARCHAR(2000),
     resume VARCHAR(100)
 );
 
@@ -26,11 +26,12 @@ CREATE TABLE IF NOT EXISTS education(
     edu_id int NOT NULL auto_increment,
     start_date DATE NOT NULL,
     end_date DATE,
-    grade FLOAT(2,2) NOT NULL,
+    grade DECIMAL(2,2) NOT NULL,
     degree varchar(100) NOT NULL,
     school varchar(100) NOT NULL,
     FOREIGN KEY (userid) REFERENCES user(userid),
-    PRIMARY KEY(edu_id)
+    PRIMARY KEY(edu_id),
+    still BOOLEAN DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS projects(
@@ -59,7 +60,8 @@ CREATE TABLE IF NOT EXISTS experience(
     end_date DATE,
     PRIMARY KEY(exp_id),
     FOREIGN KEY (userid) REFERENCES user(userid),
-    location VARCHAR(100) NOT NULL
+    location VARCHAR(100) NOT NULL, 
+    still BOOLEAN DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS experiance_tech(
@@ -80,8 +82,6 @@ CREATE TABLE IF NOT EXISTS email_verification(
     userid int NOT NULL,
     email VARCHAR(100) NOT NULL,
     code varchar(6) NOT NULL,
-    time int NOT NULL,
-    tried int NOT NULL,
     FOREIGN KEY (userid) REFERENCES user(userid)
 )
 

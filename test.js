@@ -7,3 +7,4 @@ const getData = async () => {
 // getData().then((result)=>{
 //     console.log(result)
 // })
+

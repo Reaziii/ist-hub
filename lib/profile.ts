@@ -6,6 +6,7 @@ import { signNewToken } from "./auth";
 import { cookies } from 'next/headers'
 import { ErrorMessage } from "@/constants";
 import sendMail from "./sendmail";
+import { formatDate } from "./utils";
 
 export const uploadProfilePicture = async (form: FormData): Promise<ServerMessageInterface & { img?: string }> => {
     "use server"
@@ -97,6 +98,7 @@ export const updateAbout = async (about: string): Promise<ServerMessageInterface
 export const addNewEducation = async (params: EducationInterface): Promise<ServerMessageInterface> => {
     "use server"
     try {
+        if(params.end_date === '') params.end_date = formatDate(new Date())
         let usr = await user();
         if (!usr || !usr.login || !usr.usr) return ErrorMessage.UNAUTHORIZED;
         let sql = `select userid from user where email = ?`
@@ -148,6 +150,7 @@ export const getEducations = async (email: string): Promise<ServerMessageInterfa
 export const updateAnEducation = async (params: EducationInterface): Promise<ServerMessageInterface> => {
     "use server"
     try {
+        if(params.end_date === '') params.end_date = formatDate(new Date())
         const usr = await user();
         if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
         let sql = `select userid from user where email = ?`
@@ -180,8 +183,8 @@ export const deleteAnEduItem = async (id: number): Promise<ServerMessageInterfac
 
 export const addNewExperience = async (params: ExperieneInterfaces): Promise<ServerMessageInterface> => {
     "use server"
-    console.log(params)
     try {
+        if(params.end_date === '') params.end_date = formatDate(new Date())
         const usr = await user();
         if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
         let sql = `select userid from user where email = ?`
@@ -233,6 +236,7 @@ export const getExperiences = async (email: string): Promise<ServerMessageInterf
 export const updateAnExperience = async (params: ExperieneInterfaces): Promise<ServerMessageInterface> => {
     "use server"
     try {
+        if(params.end_date === '') params.end_date = formatDate(new Date())
         const usr = await user();
         if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
         let sql = `select userid from user where email = ?`

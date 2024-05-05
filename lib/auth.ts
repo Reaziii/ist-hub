@@ -16,8 +16,9 @@ export const registration = async (name: string, email: string, dept: string, ba
             return { success: false, msg: "Password doesn't match" }
         }
         let username = `${dept.toString().toLowerCase()}-${batch}-${roll}`;
+        let photo = "";
         let values = [
-            [name, dept, batch, roll, phone, email, pass, username]
+            [name, dept, batch, roll, phone, email, pass, username, photo]
         ]
 
         let sql = "select * from user where email_verified = ? and (email = ? or roll_no = ? or phone = ?)";
@@ -30,15 +31,15 @@ export const registration = async (name: string, email: string, dept: string, ba
         await conn.query(sql, [email]);
         sql = "delete from user where email = ?"
         await conn.query(sql, [email]);
-        sql = `insert into user(fullname, department, batch, roll_no, phone, email, password, username) values ?`
+        sql = `insert into user(fullname, department, batch, roll_no, phone, email, password, username, photo) values ?`
         data = await conn.query(sql, [values])
         sql = `select userid from user where email = ?`
         data = await conn.query(sql, [email]) as any[]
 
         const otp = otpgenerator.generate(6, { upperCaseAlphabets: false, specialChars: false })
-        sql = `insert into email_verification(userid, code, time,tried, email) value ?`
+        sql = `insert into email_verification(userid, code, email) value ?`
         let values2 = [
-            [data[0][0].userid, otp, new Date().getTime(), 0, email]
+            [data[0][0].userid, otp, email]
         ]
         await conn.query(sql, [values2]);
         let mail = new sendmail(email as string, "Email Verification - IST HUB", `Your verification code is - ${otp}`)
@@ -141,9 +142,9 @@ export const forgetpassword = async (form: FormData): Promise<{ success: boolean
             return { success: false, msg: "Invalid email address" }
         }
         const otp = otpgenerator.generate(6, { upperCaseAlphabets: false, specialChars: false })
-        sql = `insert into email_verification(userid, code, time,tried, email) value ?`
+        sql = `insert into email_verification(userid, code,  email) value ?`
         let values2 = [
-            [data[0][0].userid, otp, new Date().getTime(), 0, email]
+            [data[0][0].userid, otp, email]
         ]
         await conn.query(sql, [values2]);
         let mail = new sendmail(email as string, "Email Verification - IST HUB", `Your verification code is - ${otp}`)
@@ -178,4 +179,9 @@ export const verifyAndChangePassword = async (form: FormData): Promise<{ success
         console.log('[verifyandchangepassword failed]====>\n', err)
         return { success: true, msg: "Server error" }
     }
+}
+
+export const logout = async ()=>{
+    "use server";
+    cookies().delete("token")
 }

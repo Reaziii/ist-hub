@@ -62,7 +62,7 @@ const RegistrationForm: React.FC<{ handleRegistration: (name: string, email: str
         >
             {({ handleSubmit, isSubmitting, handleChange, values, errors, touched }: FormikProps<RegistrationInterface>) => {
                 return (
-                    <section className="bg-gray-50">
+                    <section className="bg-gray-50 max-w-screen-xl mx-auto">
                         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                             <div className="w-full bg-white rounded-lg shadow  md:mt-0 sm:max-w-full xl:p-0  ">
                                 <div className="p-6 space-y-4 md:space-y-6 sm:p-8">

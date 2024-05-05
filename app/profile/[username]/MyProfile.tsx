@@ -33,7 +33,7 @@ const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
 
     }
     return (
-        <div>
+        <div className="max-w-screen-xl mx-auto">
             <div className='w-full px-[40px] box-border'>
                 <div className='border border-[#ccc] mt-[20px] pb-[40px] overflow-hidden bg-white rounded-lg shadow'>
                     <div style={{
