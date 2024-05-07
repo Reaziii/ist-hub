@@ -48,6 +48,8 @@ const Step4: FC<Step4Props> = ({ addNewEmailAsVerifier, showcase_id, deleteVerif
               }
             })
           }
+
+          
           const addItemToList = () => {
             if (!values.email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
               setErrors({ ...errors, email: "Invalid email address" })
