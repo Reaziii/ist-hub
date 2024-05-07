@@ -1,4 +1,4 @@
--- Active: 1714933239682@@127.0.0.1@3307@ist-hub
+-- Active: 1714986337180@@127.0.0.1@3307@ist-hub
 
 
 select * from user;
@@ -39,4 +39,8 @@ COLUMN about VARCHAR(2000);
 
 ALTER TABLE education add column still BOOLEAN
 
-ALTER TABLE education add COLUMN grade DECIMAL(2,2);
+ALTER Table education drop COLUMN grade;
+
+ALTER TABLE education add COLUMN grade FLOAT;
+
+select * from showcase;

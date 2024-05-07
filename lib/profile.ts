@@ -98,7 +98,7 @@ export const updateAbout = async (about: string): Promise<ServerMessageInterface
 export const addNewEducation = async (params: EducationInterface): Promise<ServerMessageInterface> => {
     "use server"
     try {
-        if(params.end_date === '') params.end_date = formatDate(new Date())
+        if (params.end_date === '') params.end_date = formatDate(new Date())
         let usr = await user();
         if (!usr || !usr.login || !usr.usr) return ErrorMessage.UNAUTHORIZED;
         let sql = `select userid from user where email = ?`
@@ -150,7 +150,7 @@ export const getEducations = async (email: string): Promise<ServerMessageInterfa
 export const updateAnEducation = async (params: EducationInterface): Promise<ServerMessageInterface> => {
     "use server"
     try {
-        if(params.end_date === '') params.end_date = formatDate(new Date())
+        if (params.end_date === '') params.end_date = formatDate(new Date())
         const usr = await user();
         if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
         let sql = `select userid from user where email = ?`
@@ -184,7 +184,7 @@ export const deleteAnEduItem = async (id: number): Promise<ServerMessageInterfac
 export const addNewExperience = async (params: ExperieneInterfaces): Promise<ServerMessageInterface> => {
     "use server"
     try {
-        if(params.end_date === '') params.end_date = formatDate(new Date())
+        if (params.end_date === '') params.end_date = formatDate(new Date())
         const usr = await user();
         if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
         let sql = `select userid from user where email = ?`
@@ -236,7 +236,7 @@ export const getExperiences = async (email: string): Promise<ServerMessageInterf
 export const updateAnExperience = async (params: ExperieneInterfaces): Promise<ServerMessageInterface> => {
     "use server"
     try {
-        if(params.end_date === '') params.end_date = formatDate(new Date())
+        if (params.end_date === '') params.end_date = formatDate(new Date())
         const usr = await user();
         if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
         let sql = `select userid from user where email = ?`
@@ -341,14 +341,13 @@ export const addNewShowcase = async (name: string): Promise<ServerMessageInterfa
         await conn.query('START TRANSACTION');
 
         // Insert data into the showcase table
-        const insertSql = 'INSERT INTO showcase (name, userid) VALUES (?,?)';
-        await conn.query(insertSql, [name, usr.usr.userid]);
+        const insertSql = 'INSERT INTO showcase (name, userid, description) VALUES (?,?,?)';
+        await conn.query(insertSql, [name, usr.usr.userid, ""]);
 
         // Get the last inserted ID
         const res = (await conn.query('SELECT LAST_INSERT_ID() AS lastInsertId')) as any[]
         const lastInsertId = res[0][0].lastInsertId;
         await conn.query('COMMIT');
-        console.log(lastInsertId)
         return { success: true, msg: "Succesfully created new Shwocase", showcase_id: lastInsertId }
     } catch (err) {
         console.log(err);
@@ -490,4 +489,45 @@ export const updateVerifierEmailsOfShowcase = async (emails: string[], showcase_
 
 
     return { success: false, msg: "Failed to update emails" }
-} 
+}
+
+
+export const addNewVerifierEmail = async (email: string, showcase_id: number): Promise<ServerMessageInterface> => {
+    "use server"
+    try {
+        let usr = await user();
+        if (!usr.usr) return { success: false, msg: "unauthorized" }
+        let sql = 'select * from showcase where userid = ? and showcase_id = ?';
+        let data = await conn.query(sql, [usr.usr.userid, showcase_id]) as any[];
+        if(data[0].length===0) return {success : false, msg : "Unauthorized"};
+        sql = `select * from showcase_verfier_details where email = ? and showcase_id = ?`;
+        data = await conn.query(sql, [email, showcase_id]) as any[];
+        if (data[0].length > 0) return { success: false, msg: "Email already exists" };
+        sql = 'insert into showcase_verfier_details(email, showcase_id, verified, name, title, company, mailSent) values (?,?,?,?,?,?,?)';
+        await conn.query(sql, [email, showcase_id, false, "", "", "", false]);
+        return { success: true, msg: "Verifier added succesfully" }
+    } catch (err) {
+        console.log(err);
+        return { success: false, msg: "Failed to add verifier" }
+    }
+
+    
+}
+
+export const removeVerifierEmail = async (email:string, showcase_id: number): Promise<ServerMessageInterface> =>{
+    "use server"
+    try{
+        let usr = await user();
+        if (!usr.usr) return { success: false, msg: "unauthorized" }
+        let sql = 'select * from showcase where userid = ? and showcase_id = ?';
+        let data = await conn.query(sql, [usr.usr.userid, showcase_id]) as any[];
+        if(data[0].length===0) return {success : false, msg : "Unauthorized"};
+
+        sql = 'delete from showcase_verfier_details where email = ? and showcase_id = ?';
+        await conn.query(sql, [email, showcase_id]);
+        return {success : true, msg : "Verifier deleted succesfully"}
+    }catch(err){
+        console.log(err);
+        return {success : false , msg : "Failed to delete"}
+    }
+}
