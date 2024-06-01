@@ -1,10 +1,13 @@
 import conn from "./mysql";
-
+import bcrypt from 'bcrypt'
 import otpgenerator from 'otp-generator'
 import sendmail from './sendmail'
 import jsonwebtoken from 'jsonwebtoken'
 import { user } from "./user";
 import { cookies } from "next/headers";
+import MongoConn from "./mongodb";
+import UserModel from "@/models/UserModel";
+import EmailVerificationModel from "@/models/EmailVerificationModel";
 export const registration = async (name: string, email: string, dept: string, batch: number, roll: number, phone: string, pass: string, conPass: string): Promise<{ success: boolean, msg: string }> => {
     "use server";
     try {
@@ -15,33 +18,57 @@ export const registration = async (name: string, email: string, dept: string, ba
         if (pass !== conPass) {
             return { success: false, msg: "Password doesn't match" }
         }
+
         let username = `${dept.toString().toLowerCase()}-${batch}-${roll}`;
         let photo = "";
         let values = [
             [name, dept, batch, roll, phone, email, pass, username, photo]
         ]
+        await MongoConn();
 
-        let sql = "select * from user where email_verified = ? and (email = ? or roll_no = ? or phone = ?)";
 
-        let data = await conn.query(sql, [true, email, roll, phone]) as any[];
-        if (data[0].length >= 1) {
-            return { success: false, msg: "email or roll or phone already exists" }
+        let data = await UserModel.findOne({
+            email_verified: true,
+            $or: [
+                { email: email },
+                { roll_no: roll },
+                { phone: phone }
+            ]
+        });
+        if (data) {
+            return { success: false, msg: "email or roll or phone is already exists" }
         }
-        sql = "delete from email_verification where email = ?"
-        await conn.query(sql, [email]);
-        sql = "delete from user where email = ?"
-        await conn.query(sql, [email]);
-        sql = `insert into user(fullname, department, batch, roll_no, phone, email, password, username, photo) values ?`
-        data = await conn.query(sql, [values])
-        sql = `select userid from user where email = ?`
-        data = await conn.query(sql, [email]) as any[]
+        await EmailVerificationModel.deleteMany({
+            email: email
+        })
 
+
+        await UserModel.deleteMany({
+            email
+        })
+
+        pass = await bcrypt.hash(pass, 10);
+
+        let newUser = new UserModel({
+            fullname: name,
+            email,
+            department: dept,
+            batch,
+            roll_no: roll,
+            phone,
+            password: pass,
+            username,
+            bio: "",
+            about: "",
+            resume: ""
+        })
+        await newUser.save();
         const otp = otpgenerator.generate(6, { upperCaseAlphabets: false, specialChars: false })
-        sql = `insert into email_verification(userid, code, email) value ?`
-        let values2 = [
-            [data[0][0].userid, otp, email]
-        ]
-        await conn.query(sql, [values2]);
+        let verification = new EmailVerificationModel({
+            code: otp,
+            email: email
+        })
+        await verification.save();
         let mail = new sendmail(email as string, "Email Verification - IST HUB", `Your verification code is - ${otp}`)
         await mail.send();
         return { success: true, msg: "Registration completed" }
@@ -57,17 +84,15 @@ export const verifyEmail = async (email: string, code: string): Promise<{ succes
     "use server";
     try {
 
-        let sql = `select * from email_verification where email = ? and code = ?`
-        let data = await conn.query(sql, [email, code]) as any[]
-
-        if (data[0].length === 0) {
+        let verification = await EmailVerificationModel.findOne({
+            email: email,
+            code: code
+        })
+        if (!verification) {
             return { success: false, msg: "Invalid code" }
         }
-
-        sql = `update user set email_verified = ? where email = ?`
-        data = await conn.query(sql, [true, email,])
-        sql = `delete from email_verification where email = ? and code = ?`
-        await conn.query(sql, [email, code])
+        await UserModel.updateOne({ email: email }, { email_verified: true });
+        await verification.deleteOne();
         return { success: true, msg: "Verified successfully" }
     } catch (err) {
         console.log('[verifyemail failed]====>\n', err)
@@ -179,7 +204,7 @@ export const verifyAndChangePassword = async (form: FormData): Promise<{ success
     }
 }
 
-export const logout = async ()=>{
+export const logout = async () => {
     "use server";
     cookies().delete("token")
 }

@@ -3,6 +3,23 @@ interface ServerMessageInterface {
     msg: string
 }
 
+interface UserInterface {
+    fullname: string,
+    department: string,
+    batch: number,
+    roll_no: number,
+    phone: string,
+    email: string,
+    password: string,
+    photo: string,
+    verfified: boolean,
+    username: string,
+    email_verfied: boolean,
+    bio: string,
+    about: string,
+    resume: string
+}
+
 interface EducationInterface {
     school: string,
     degree: string,
@@ -49,5 +66,16 @@ interface ShowcaseVerifierDetails {
     name: string,
     company: string,
     mailSent: boolean,
-    title:string
+    title: string
+}
+
+interface Showcase {
+    showcase_id: number,
+    userid: number,
+    name: string,
+    description: string,
+    tags: {
+        showcase_id: number,
+        tag: string
+    }[]
 }

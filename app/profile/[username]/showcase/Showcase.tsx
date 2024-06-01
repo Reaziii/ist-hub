@@ -2,10 +2,22 @@
 import ButtonSpinner from '@/components/ButtonSpinner';
 import React, { FC, useEffect, useState } from 'react'
 import AddShowcase from './AddShowcase';
+import { truncateString } from '@/utilities/string';
 
-const Showcase: FC = () => {
+interface ShowcaseProps {
+    getProfileShowcase: (userid: number) => Promise<ServerMessageInterface & { showcases: Showcase[] }>,
+    userid: number
+}
+
+
+const Showcase: FC<ShowcaseProps> = ({ getProfileShowcase, userid }) => {
     const [loading, setLoading] = useState(false);
-
+    let [showcases, setShowcases] = useState<Showcase[]>([])
+    useEffect(() => {
+        getProfileShowcase(userid).then((res) => {
+            setShowcases([...res.showcases])
+        })
+    }, [])
     return (
         <div>
             <div className='border border-[#ccc] mt-[20px] rounded-lg p-[40px] overflow-hidden bg-white relative'>
@@ -17,7 +29,25 @@ const Showcase: FC = () => {
                             <ButtonSpinner />
                         </div> :
                             <div className='mt-6'>
+                                {
+                                    showcases.map((item, key) => (
+                                        <div className="mb-[40px]" key={key}>
+                                            <h1 className="font-bold">{item.name}</h1>
+                                            <p>{truncateString(item.description, 100)}</p>
 
+
+                                            <div className="w-full flex flex-wrap gap-[10px] mt-[10px]">
+                                                {
+                                                    item.tags.map((item, key) => (
+                                                        <div className="py-[5px] px-[10px] border rounded-full">
+                                                            {item.tag}
+                                                        </div>
+                                                    ))
+                                                }
+                                            </div>
+                                        </div>
+                                    ))
+                                }
                             </div>
                     }
                 </div>

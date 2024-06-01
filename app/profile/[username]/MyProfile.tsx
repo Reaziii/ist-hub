@@ -12,7 +12,7 @@ import Experience from './Experience/Experience';
 import Resume from './Resume';
 import Skill from './skills/Skill';
 import Showcase from './showcase/Showcase';
-
+import { getProfileShowcases } from '@/lib/showcases';
 const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
     let usr = await user();
     let details = await extractEmailAddress(username)
@@ -67,7 +67,7 @@ const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
                 <Education owner={owner} deleteItem={deleteAnEduItem} update={updateAnEducation} addNewEducation={addNewEducation} getEducations={getEducations} email={profile.profile.email} />
                 <Experience owner={owner} deleteItem={deleteAnExperienceItem} getExperinces={getExperiences} email={profile.profile.email} addNewExperience={addNewExperience} update={updateAnExperience} />
                 <Skill add={addNewSkill} getSkills={handleGetSkills} deleteItem={deleteASkill} />
-                <Showcase />
+                <Showcase userid={profile.profile.userid} getProfileShowcase={getProfileShowcases} />
             </div>
         </div>
     )
