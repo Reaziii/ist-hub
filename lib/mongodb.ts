@@ -2,9 +2,16 @@ import UserModel from '@/models/UserModel';
 import mongoose from 'mongoose';
 
 
+let connection: {isConnected? : number} = {}
+
 const MongoConn = async () => {
-    await mongoose.connect(process.env.MONGODBURI ?? "");
+    if(connection.isConnected){
+        return; 
+    }
+    let db = await mongoose.connect(process.env.MONGODBURI ?? "");
     console.log("mongodb connected")
+    connection.isConnected = db.connections[0].readyState;
+    return ;
 }
 
 

@@ -24,7 +24,7 @@ const ForgetPassword = () => {
                         required
                     />
                     <p className='text-[12px] mb-[10px] mt-[10px]'>Please Enter your email. We will send a short verification code in your email.</p>
-                    <button className='h-[40px] w-[49%] bg-main text-white rounded-lg font-bold mt-[30px] mb-[40px]'>Next</button>
+                    <button className='h-[40px] w-[49%] bg-primary-700 text-white rounded-lg font-bold mt-[30px] mb-[40px]'>Next</button>
                 </Form>
             </div>
         </>

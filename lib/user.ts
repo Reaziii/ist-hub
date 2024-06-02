@@ -2,11 +2,11 @@ import { cookies } from "next/headers"
 import jwt from 'jsonwebtoken'
 import conn from "./mysql";
 
-export const user = async (): Promise<{ login: boolean, usr?: { name: string, email: string, photo: string, username: string, userid: number } }> => {
+export const user = async (): Promise<{ login: boolean, usr?: { name: string, email: string, photo: string, username: string, _id: string } }> => {
     let token = cookies().get("token");
     try {
         if (!token) throw "";
-        let details = jwt.verify(token.value, process.env.JWTSECRET ?? "ISTHUB") as { name: string, email: string, photo: string, username: string, userid: number };
+        let details = jwt.verify(token.value, process.env.JWTSECRET ?? "ISTHUB") as { name: string, email: string, photo: string, username: string, _id: string };
         return { login: true, usr: details }
     }
     catch (err) {

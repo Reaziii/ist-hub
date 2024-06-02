@@ -24,7 +24,7 @@ const Verify: React.FC<{ searchParams?: { [key: string]: string | string[] | und
                     <p className='text-[14px] mb-[10px] mt-[20px]'>OTP</p>
                     <Input
                         className='w-full h-[40px] text-[14px]'
-                        placeholder='Your email address'
+                        placeholder='You OTP (ex : 2xAbcy)'
                         name='code'
                         type='text'
                         required
@@ -46,7 +46,7 @@ const Verify: React.FC<{ searchParams?: { [key: string]: string | string[] | und
                         type='password'
                         required
                     />
-                    <button className='h-[40px] w-[49%] bg-main text-white rounded-lg font-bold mt-[30px] mb-[40px]'>Next</button>
+                    <button className='h-[40px] w-[49%] bg-primary-700 text-white rounded-lg font-bold mt-[30px] mb-[40px]'>Next</button>
                 </Form>
             </div>
         </>

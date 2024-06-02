@@ -12,25 +12,26 @@ interface UserInterface {
     email: string,
     password: string,
     photo: string,
-    verfified: boolean,
+    verified: boolean,
     username: string,
     email_verfied: boolean,
     bio: string,
     about: string,
-    resume: string
+    resume: string,
 }
 
 interface EducationInterface {
     school: string,
     degree: string,
     grade: number,
-    start_date: string,
-    end_date: string | null | undefined,
-    edu_id?: number,
+    start_date: Date,
+    end_date: Date,
+    _id: string,
     still: boolean,
+    userid : string
 }
 
-interface Profile {
+interface ProfileInterface {
     photo: string,
     bio: string,
     about: string,
@@ -38,7 +39,8 @@ interface Profile {
     email: string,
     fullname: string,
     resume: string | null,
-    userid: number;
+    _id : string,
+    owner : boolean
 }
 
 interface ExperieneInterfaces {

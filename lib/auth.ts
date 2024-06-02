@@ -11,6 +11,7 @@ import EmailVerificationModel from "@/models/EmailVerificationModel";
 export const registration = async (name: string, email: string, dept: string, batch: number, roll: number, phone: string, pass: string, conPass: string): Promise<{ success: boolean, msg: string }> => {
     "use server";
     try {
+        await MongoConn();
         if (!name || !email || !dept || !batch || !roll || !phone || !conPass || !pass) {
             return { success: false, msg: "All field required" }
         }
@@ -24,7 +25,6 @@ export const registration = async (name: string, email: string, dept: string, ba
         let values = [
             [name, dept, batch, roll, phone, email, pass, username, photo]
         ]
-        await MongoConn();
 
 
         let data = await UserModel.findOne({
@@ -84,6 +84,8 @@ export const verifyEmail = async (email: string, code: string): Promise<{ succes
     "use server";
     try {
 
+        await MongoConn();
+
         let verification = await EmailVerificationModel.findOne({
             email: email,
             code: code
@@ -91,7 +93,12 @@ export const verifyEmail = async (email: string, code: string): Promise<{ succes
         if (!verification) {
             return { success: false, msg: "Invalid code" }
         }
-        await UserModel.updateOne({ email: email }, { email_verified: true });
+        let user = await UserModel.findOne({ email: email });
+        if (!user) {
+            return { success: false, msg: "User doesn't exists" }
+        }
+        user.email_verfied = true;
+        await user.save();
         await verification.deleteOne();
         return { success: true, msg: "Verified successfully" }
     } catch (err) {
@@ -109,14 +116,23 @@ export const verifyEmail = async (email: string, code: string): Promise<{ succes
 export const login = async (params: { email: string, password: string }): Promise<{ success: boolean, msg: string, token?: string }> => {
     "use server";
     try {
-        let sql = `select * from user where email = ? and password = ? and email_verified = true`
-        let data = await conn.query(sql, [params.email, params.password]) as any[]
-        if (data[0].length === 0) {
-            return { success: false, msg: "Invalid email or password" }
+        await MongoConn();
+        let user = await UserModel.findOne({
+            email: params.email,
+            email_verfied: true
+
+        })
+        if (!user) {
+            return { success: false, msg: "Email not found!" }
         }
+
+        let verify_pass = await bcrypt.compare(params.password, user.password);
+        if (!verify_pass) {
+            return { success: false, msg: "Password is incorrect" }
+        }
+
         let token = (await signNewToken(params.email)).token;
         if (!token) throw ""
-        cookies().set('token', token as string)
         return { success: true, msg: "Login successfull", token }
 
     } catch (err) {
@@ -130,25 +146,28 @@ export const signNewToken = async (email?: string): Promise<{ token?: string }> 
         if (!email)
             email = (await user()).usr?.email;
         if (!email) return {};
-        let sql = `select * from user where email = ? and email_verified = true`
-        let data = await conn.query(sql, [email]) as any[]
-        if (data[0].length === 0) {
+        let _user = await UserModel.findOne({
+            email,
+            email_verfied: true
+        })
+        if (!_user) {
             return {}
         }
         let token = jsonwebtoken.sign({
-            name: data[0][0].fullname,
+            name: _user.fullname,
             email: email,
-            photo: data[0][0].photo,
-            roll_no: data[0][0].roll_no,
-            batch: data[0][0].batch,
-            username: data[0][0].username,
-            verified: data[0][0].verified,
-            userid: data[0][0].userid
+            photo: _user.photo,
+            roll_no: _user.roll_no,
+            batch: _user.batch,
+            username: _user.username,
+            verified: _user.verified,
+            _id: _user._id
         }, process.env.JWTSECRET ?? "ISTHUB")
+        cookies().set('token', token as string)
         return { token }
 
     } catch (err) {
-
+        console.log("sign token failed ===> ", err)
     }
     return {};
 }
@@ -156,22 +175,21 @@ export const signNewToken = async (email?: string): Promise<{ token?: string }> 
 
 export const forgetpassword = async (form: FormData): Promise<{ success: boolean, msg: string }> => {
     try {
-        const email = form.get("email") as string;
+        const email = form.get("email") as string | null;
         if (!email) {
             return { success: false, msg: "Email is invalid" }
         }
 
-        let sql = `select * from user where email = ? and email_verified = ?`
-        let data = await conn.query(sql, [email, true]) as any[];
-        if (data[0].length === 0) {
-            return { success: false, msg: "Invalid email address" }
+        let user = await UserModel.findOne({email, email_verfied : true})
+        if(!user){
+            return {success : false, msg : "Invalid email address"}
         }
         const otp = otpgenerator.generate(6, { upperCaseAlphabets: false, specialChars: false })
-        sql = `insert into email_verification(userid, code,  email) value ?`
-        let values2 = [
-            [data[0][0].userid, otp, email]
-        ]
-        await conn.query(sql, [values2]);
+        let verify = new EmailVerificationModel({
+            code : otp,
+            email : email
+        })
+        await verify.save();
         let mail = new sendmail(email as string, "Email Verification - IST HUB", `Your verification code is - ${otp}`)
         await mail.send();
         return { success: true, msg: "OTP has been sent" }
@@ -184,7 +202,7 @@ export const forgetpassword = async (form: FormData): Promise<{ success: boolean
 export const verifyAndChangePassword = async (form: FormData): Promise<{ success: boolean, msg?: string }> => {
     try {
         let email = form.get("email")
-        let password = form.get("password");
+        let password = form.get("password") as string;
         let confirmpassword = form.get("con-pass")
         let code = form.get("code");
         if (password !== confirmpassword) {
@@ -195,8 +213,16 @@ export const verifyAndChangePassword = async (form: FormData): Promise<{ success
         if (verify.success === false) {
             return verify;
         }
-        let sql = `update user set password = ? where email = ?`
-        await conn.query(sql, [password, email]);
+        let user = await UserModel.findOne({
+            email : email,
+
+        })
+        if(!user){
+            return {success : false, msg : "Invalid email address"};
+        }
+        let hash = await bcrypt.hash(password, 10);
+        user.password = hash;
+        await user.save();
         return { success: true, msg: "Password changed" };
     } catch (err) {
         console.log('[verifyandchangepassword failed]====>\n', err)

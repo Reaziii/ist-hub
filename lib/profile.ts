@@ -7,6 +7,8 @@ import { cookies } from 'next/headers'
 import { ErrorMessage } from "@/constants";
 import sendMail from "./sendmail";
 import { formatDate } from "./utils";
+import UserModel from "@/models/UserModel";
+import EducationModel from "@/models/EducationModel";
 
 export const uploadProfilePicture = async (form: FormData): Promise<ServerMessageInterface & { img?: string }> => {
     "use server"
@@ -38,18 +40,27 @@ export const uploadProfilePicture = async (form: FormData): Promise<ServerMessag
     }
 }
 
-export const getProfileDetails = async (email: string): Promise<ServerMessageInterface & { profile?: Profile }> => {
+export const getProfileDetails = async (userid: string): Promise<ServerMessageInterface & { profile?: ProfileInterface }> => {
     try {
-
-        let sql = `select * from user where email = ?`
-        let data = await conn.query(sql, [email]);
-        if (data.length) {
-            let d = data[0] as Profile[];
-            if (d.length) {
-                let profile: Profile = d[0];
-                return { success: true, msg: "Profile retrived", profile }
-            }
+        let usr = await user();
+        let _user = await UserModel.findOne({
+            _id: userid
+        }).lean();
+        if (!_user) {
+            return { success: false, msg: "User doesn't exists" }
         }
+        let profile: ProfileInterface = {
+            phone: _user.phone,
+            bio: _user.bio,
+            about: _user.about,
+            photo: _user.photo,
+            email: _user.email,
+            fullname: _user.fullname,
+            resume: _user.resume,
+            _id: String(_user._id),
+            owner: usr.usr?._id === _user._id,
+        };
+        return { success: true, msg: "Profile fetched successfully", profile }
 
     } catch (err) {
 
@@ -66,13 +77,15 @@ export const updateNameAndBio = async (name: string, bio: string): Promise<Serve
         if (!usr.usr) {
             return ErrorMessage.UNAUTHORIZED;
         }
-        let sql = `update user set fullname = ? , bio = ? where email = ?`;
-        await conn.query(sql, [name, bio, usr.usr?.email]);
-        let token = (await signNewToken()).token
-        cookies().set("token", token as string)
+        let _user = await UserModel.findById(usr.usr._id);
+        if (!_user) { return { success: false, msg: "User doesn't exists" } }
+        _user.fullname = name;
+        _user.bio = name;
+        await _user.save();
+        let token = (await signNewToken(usr.usr.email)).token
         return { success: true, msg: "Profile Updated successfully", token }
     } catch (err) {
-        console.log(err);
+        console.log("bio update failed ===> ", err);
         return { success: false, msg: "Failed to update" }
     }
 }
@@ -84,10 +97,11 @@ export const updateAbout = async (about: string): Promise<ServerMessageInterface
         if (!usr.usr) {
             return ErrorMessage.UNAUTHORIZED;
         }
-        let sql = `update user set about = ? where email = ?`;
-        await conn.query(sql, [about, usr.usr.email]);
-        let token = (await signNewToken()).token
-        cookies().set("token", token as string)
+        let _user = await UserModel.findById(usr.usr._id);
+        if (!_user) return { success: false, msg: "User doesn't exists" }
+        _user.about = about;
+        await _user.save();
+        let token = (await signNewToken(usr.usr.email)).token
         return { success: true, msg: "About Updated successfully", token }
     } catch (err) {
         console.log(err);
@@ -101,13 +115,14 @@ export const addNewEducation = async (params: EducationInterface): Promise<Serve
         if (params.end_date === '') params.end_date = formatDate(new Date())
         let usr = await user();
         if (!usr || !usr.login || !usr.usr) return ErrorMessage.UNAUTHORIZED;
-        let sql = `select userid from user where email = ?`
-        let data = await conn.query(sql, [usr.usr.email]) as any[];
-        if (data.length >= 2) {
-            let userid = data[0][0].userid;
-            sql = `insert into education(userid, start_date, end_date, grade, school, degree, still) values(?,?,?,?,?,?, ?)`
-            data = await conn.query(sql, [userid, params.start_date, params.end_date, params.grade, params.school, params.degree, params.still])
-            return { success: true, msg: "Successfully added" }
+        let education = new EducationModel({
+            ...params,
+            userid: String(usr.usr._id)
+        });
+        await education.save();
+        return {
+            success: true,
+            msg: "New education added successfully"
         }
     }
     catch (err) {
@@ -115,27 +130,15 @@ export const addNewEducation = async (params: EducationInterface): Promise<Serve
     }
 
 
-
-    return { success: false, msg: "Failed to add" }
+    return { success: false, msg: "Failed to add Education" }
 }
 
 
-export const getEducations = async (email: string): Promise<ServerMessageInterface & { educations?: EducationInterface[] }> => {
+export const getEducations = async (userid: string): Promise<ServerMessageInterface & { educations?: EducationInterface[] }> => {
     "use server"
     try {
-        let sql = `
-            SELECT e.*
-            FROM education e
-            INNER JOIN user u ON e.userid = u.userid
-            WHERE u.email = ?
-            ORDER BY e.start_date DESC
-            ;
-        `
-        let data = (await conn.query(sql, [email]))[0] as EducationInterface[];
-
-        return { success: true, msg: "Education retrived", educations: data }
-
-
+        let educations = await EducationModel.find({ userid }).lean();
+        return { success: true, msg: "Education retrived", educations: educations }
     }
     catch (err) {
         console.log(err);
@@ -150,16 +153,21 @@ export const getEducations = async (email: string): Promise<ServerMessageInterfa
 export const updateAnEducation = async (params: EducationInterface): Promise<ServerMessageInterface> => {
     "use server"
     try {
-        if (params.end_date === '') params.end_date = formatDate(new Date())
         const usr = await user();
         if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
-        let sql = `select userid from user where email = ?`
-        let data = await conn.query(sql, [usr.usr.email]) as any[]
-        if (data.length >= 2) {
-            let userid = data[0][0].userid;
-            sql = `update education set degree = ? , school = ?, start_date= ? , end_date = ?, grade = ?, still = ? where edu_id = ? and userid = ?`;
-            await conn.query(sql, [params.degree, params.school, params.start_date, params.end_date, params.grade, params.still, params.edu_id, userid]);
-            return { success: true, msg: "Education updated successfully" }
+        let education = await EducationModel.findById(params._id);
+        if (!education) {
+            return { success: false, msg: "Education doesn't exists" }
+        }
+        education.school = params.school;
+        education.degree = params.degree;
+        education.grade = params.grade;
+        education.still = params.still;
+        education.start_date = params.start_date;
+        education.end_date = params.end_date;
+        await education.save();
+        return {
+            success: true, msg: "Education updated successfully"
         }
     }
     catch (err) {
@@ -499,7 +507,7 @@ export const addNewVerifierEmail = async (email: string, showcase_id: number): P
         if (!usr.usr) return { success: false, msg: "unauthorized" }
         let sql = 'select * from showcase where userid = ? and showcase_id = ?';
         let data = await conn.query(sql, [usr.usr.userid, showcase_id]) as any[];
-        if(data[0].length===0) return {success : false, msg : "Unauthorized"};
+        if (data[0].length === 0) return { success: false, msg: "Unauthorized" };
         sql = `select * from showcase_verfier_details where email = ? and showcase_id = ?`;
         data = await conn.query(sql, [email, showcase_id]) as any[];
         if (data[0].length > 0) return { success: false, msg: "Email already exists" };
@@ -511,23 +519,23 @@ export const addNewVerifierEmail = async (email: string, showcase_id: number): P
         return { success: false, msg: "Failed to add verifier" }
     }
 
-    
+
 }
 
-export const removeVerifierEmail = async (email:string, showcase_id: number): Promise<ServerMessageInterface> =>{
+export const removeVerifierEmail = async (email: string, showcase_id: number): Promise<ServerMessageInterface> => {
     "use server"
-    try{
+    try {
         let usr = await user();
         if (!usr.usr) return { success: false, msg: "unauthorized" }
         let sql = 'select * from showcase where userid = ? and showcase_id = ?';
         let data = await conn.query(sql, [usr.usr.userid, showcase_id]) as any[];
-        if(data[0].length===0) return {success : false, msg : "Unauthorized"};
+        if (data[0].length === 0) return { success: false, msg: "Unauthorized" };
 
         sql = 'delete from showcase_verfier_details where email = ? and showcase_id = ?';
         await conn.query(sql, [email, showcase_id]);
-        return {success : true, msg : "Verifier deleted succesfully"}
-    }catch(err){
+        return { success: true, msg: "Verifier deleted succesfully" }
+    } catch (err) {
         console.log(err);
-        return {success : false , msg : "Failed to delete"}
+        return { success: false, msg: "Failed to delete" }
     }
 }

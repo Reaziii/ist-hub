@@ -9,7 +9,7 @@ const schema = new mongoose.Schema<UserInterface & Document>({
     email: String,
     password: String,
     photo: String,
-    verfified: {
+    verified: {
         type: Boolean,
         default: false,
     },
@@ -25,4 +25,4 @@ const schema = new mongoose.Schema<UserInterface & Document>({
     about: String,
     resume: String
 })
-export default mongoose.models.users || mongoose.model("users", schema);
+export default (mongoose.models.users || mongoose.model("users", schema)) as mongoose.Model<UserInterface & mongoose.Document>;
