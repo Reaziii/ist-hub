@@ -1,6 +1,8 @@
 import { cookies } from "next/headers"
 import jwt from 'jsonwebtoken'
 import conn from "./mysql";
+import UserModel from "@/models/UserModel";
+import MongoConn from "./mongodb";
 
 export const user = async (): Promise<{ login: boolean, usr?: { name: string, email: string, photo: string, username: string, _id: string } }> => {
     let token = cookies().get("token");
@@ -31,17 +33,18 @@ export function extractDetails(input: string): { department: string, batch: numb
     }
 }
 
-export const extractEmailAddress = async (username: string): Promise<ServerMessageInterface & { email?: string }> => {
+export const extractEmailAddressAndId = async (username: string): Promise<ServerMessageInterface & { email?: string, _id?: string }> => {
     try {
+        await MongoConn();
         let details = extractDetails(username);
         if (!details) throw "";
-        let sql = `select email from user where department = ? and batch = ? and roll_no = ?`
-        let data = await conn.query(sql, [details?.department, details?.batch, details?.rollNumber]) as any[];
-        if (data.length >= 2) {
-            data = data[0] as Array<{ email: string }>;
-            if (data.length >= 1)
-                return { success: true, msg: "Successfully retrived", email: data[0].email }
+        let user = await UserModel.findOne({
+            username
+        })
+        if (!user) {
+            return { success: false, msg: "User not found" }
         }
+        return { success: true, msg: "Email and id retrived", email: user.email, _id: String(user._id) }
     }
     catch (err) {
         console.log(err)

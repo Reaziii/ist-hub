@@ -1,37 +1,32 @@
-import { extractEmailAddress, user } from '@/lib/user'
+import { extractEmailAddressAndId, user } from '@/lib/user'
 import React from 'react'
 import { FaCheckCircle, FaPhoneAlt } from "react-icons/fa";
 import { MdOutlineAlternateEmail } from "react-icons/md";
 import About from './About';
 import Education from './Education/Education';
 import ProfilePicture from './ProfilePicture';
-import { addNewEducation, getEducations, getProfileDetails, updateAbout, updateAnEducation, updateNameAndBio, uploadProfilePicture, deleteAnEduItem, getExperiences, addNewExperience, updateAnExperience, deleteAnExperienceItem, uploadResume, addNewSkill, getSkills, deleteASkill } from '@/lib/profile';
+import { getProfileDetails, updateAbout, updateNameAndBio, uploadProfilePicture, uploadResume } from '@/lib/profile';
+import * as EducationAPI from '@/lib/education'
 import MainProfileEdit from './MainProfileEdit';
 import { redirect } from 'next/navigation';
-import Experience from './Experience/Experience';
 import Resume from './Resume';
+import * as SkillAPI from '@/lib/skills'
+import * as ExperienceAPI from '@/lib/experience'
+import Experience from './Experience/Experience';
 import Skill from './skills/Skill';
-import Showcase from './showcase/Showcase';
-import { getProfileShowcases } from '@/lib/showcases';
 const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
     let usr = await user();
-    let details = await extractEmailAddress(username)
-    if (!details.email) {
+    let details = await extractEmailAddressAndId(username)
+    if (!details.email || !details._id) {
         return redirect("/")
     }
-    const profile = await getProfileDetails(details.email);
+    const profile = await getProfileDetails(details._id);
     if (!profile.profile) {
         return redirect("/")
     }
+
     const about = `${profile.profile.about ?? ""}`
     const owner = usr.usr?.email !== null && usr.usr?.email === details.email;
-    const handleGetSkills = async (): Promise<ServerMessageInterface & { skills: SkillInterface[] }> => {
-        "use server"
-        if (profile.profile)
-            return await getSkills(profile.profile?.userid)
-        return { success: false, msg: "Profile doesn't exists", skills: [] }
-
-    }
     return (
         <div className="max-w-screen-xl mx-auto">
             <div className='w-full px-[40px] box-border'>
@@ -64,10 +59,23 @@ const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
                     </div>
                 </div>
                 <About owner={owner} about={about} update={updateAbout} />
-                <Education owner={owner} deleteItem={deleteAnEduItem} update={updateAnEducation} addNewEducation={addNewEducation} getEducations={getEducations} email={profile.profile.email} />
-                <Experience owner={owner} deleteItem={deleteAnExperienceItem} getExperinces={getExperiences} email={profile.profile.email} addNewExperience={addNewExperience} update={updateAnExperience} />
-                <Skill add={addNewSkill} getSkills={handleGetSkills} deleteItem={deleteASkill} />
-                <Showcase userid={profile.profile.userid} getProfileShowcase={getProfileShowcases} />
+                <Education
+                    owner={owner}
+                    deleteItem={EducationAPI.deleteAnEduItem}
+                    update={EducationAPI.updateAnEducation}
+                    addNewEducation={EducationAPI.addNewEducation}
+                    getEducations={EducationAPI.getEducations}
+                    email={profile.profile.email}
+                    userid={profile.profile._id} />
+                <Experience
+                    owner={owner}
+                    deleteItem={ExperienceAPI.deleteAnExperienceItem}
+                    getExperinces={ExperienceAPI.getExperiences}
+                    userid={profile.profile._id}
+                    addNewExperience={ExperienceAPI.addNewExperience}
+                    update={ExperienceAPI.updateAnExperience} />
+                <Skill add={SkillAPI.addNewSkill} getSkills={SkillAPI.getSkills} deleteItem={SkillAPI.deleteASkill} userid={profile.profile._id} />
+                {/* <Showcase userid={profile.profile.userid} getProfileShowcase={getProfileShowcases} /> */}
             </div>
         </div>
     )

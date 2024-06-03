@@ -8,25 +8,27 @@ import AddExperience from './AddExperience'
 import UpdateExperience from './UpdateExperience'
 const Experience: FC<
     {
-        email: string,
+        userid: string,
         owner: boolean,
         update: (params: ExperieneInterfaces) => Promise<ServerMessageInterface>,
-        getExperinces: (email: string) => Promise<ServerMessageInterface & { experiences?: ExperieneInterfaces[] }>,
+        getExperinces: (userid: string) => Promise<ServerMessageInterface & { experiences?: ExperieneInterfaces[] }>,
         addNewExperience: (params: ExperieneInterfaces) => Promise<ServerMessageInterface>,
-        deleteItem: (id: number) => Promise<ServerMessageInterface>
-    }> = ({ email, getExperinces, addNewExperience, update, deleteItem, owner }) => {
+        deleteItem: (id: string) => Promise<ServerMessageInterface>
+    }> = ({ userid, getExperinces, addNewExperience, update, deleteItem, owner }) => {
         let [experiences, setExperiences] = useState<ExperieneInterfaces[]>([])
         const [loading, setLoading] = useState(true);
         let [openUpdateModal, setOpenUpdateModal] = useState<ExperieneInterfaces & { open: null | number }>({
             open: null,
-            start_date: new Date().toString(),
-            end_date: null,
+            start_date: new Date(), 
+            end_date: new Date(),
             employee_type: EmployeeType.FULL_TIME,
-            positioin: "",
+            position: "",
             location: "",
             title: "",
             company_name: "",
             still: false,
+            _id : "",
+            userid : ""
 
         });
         let handleUpdate = (id: number) => {
@@ -37,23 +39,24 @@ const Experience: FC<
         }
 
         const handleRetrive = async () => {
-            if (!getExperinces) return;
             setLoading(true);
             setExperiences([])
-            let p_education = await getExperinces(email)
+            let p_education = await getExperinces(userid)
             let _experiences: ExperieneInterfaces[] | undefined = p_education.experiences
             if (_experiences === undefined) _experiences = [];
             setExperiences([..._experiences])
             setOpenUpdateModal({
                 open: null,
-                start_date: new Date().toString(),
-                end_date: null,
+                start_date: new Date(),
+                end_date: new Date(),
                 employee_type: EmployeeType.FULL_TIME,
-                positioin: "",
+                position: "",
                 location: "",
                 title: "",
                 company_name: "",
-                still: false
+                still: false,
+                _id : "",
+                userid : ""
             })
             setLoading(false);
         }
@@ -67,14 +70,13 @@ const Experience: FC<
             await handleRetrive();
         }
         const _handleAdd = async (params: ExperieneInterfaces) => {
-            params.exp_id = openUpdateModal.exp_id
             let res = await addNewExperience(params);
             handleToast(res);
             await handleRetrive();
         }
 
         const handleDelete = async () => {
-            let res = await deleteItem(openUpdateModal.exp_id ?? 1000000);
+            let res = await deleteItem(openUpdateModal._id);
             handleToast(res);
             await handleRetrive();
 
@@ -95,7 +97,7 @@ const Experience: FC<
                                     <div onClick={() => handleUpdate(key)} key={key} className='mt-[20px] cursor-pointer'>
                                         <h1 className='font-bold'>{item.company_name}</h1>
                                         <p className='text-[14px]'>{item.title}</p>
-                                        <p className='text-[12px]'>{item.positioin}</p>
+                                        <p className='text-[12px]'>{item.position}</p>
                                         <p className='text-[12px] text-gray-500'>
                                             {getMonthAndYearFromTimestamp(new Date(item.start_date).getTime()).month} {getMonthAndYearFromTimestamp(new Date(item.start_date).getTime()).year} - {" "}
                                             {

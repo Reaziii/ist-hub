@@ -2,7 +2,6 @@
 import React, { FC } from 'react'
 import * as yup from 'yup'
 import { Formik } from 'formik'
-import handleToast from '@/components/handleToast'
 import Input from '@/components/TextInput'
 import ButtonSpinner from '@/components/ButtonSpinner'
 import { formatDate } from '@/lib/utils'
@@ -17,9 +16,12 @@ const UpdateEducation: FC<{ values: EducationInterface, close: () => void, updat
     return (
         <Formik
             onSubmit={(values, { setSubmitting }) => {
-                values.start_date = formatDate(new Date(values.start_date));
-                values.end_date = formatDate(new Date(values.end_date));
-                update(values).then(() => {
+                let finalValues: EducationInterface = {
+                    ...values,
+                    start_date: new Date(values.start_date),
+                    end_date: new Date(values.end_date)
+                }
+                update(finalValues).then(() => {
                     setSubmitting(false);
                 })
             }}
@@ -27,10 +29,11 @@ const UpdateEducation: FC<{ values: EducationInterface, close: () => void, updat
                 school: values.school ?? "",
                 degree: values.degree ?? "",
                 grade: values.grade ?? "",
-                start_date: values.start_date ? formatDate(new Date(values.start_date)) : "",
-                end_date: values.end_date ? formatDate(new Date(values.end_date)) : "",
-                edu_id: values.edu_id ?? 10000000000,
+                start_date: formatDate(values.start_date?? new Date()),
+                end_date: formatDate(values.end_date?? new Date()),
+                _id: values._id,
                 still: values.still,
+                userid: values.userid
             }}
             validationSchema={validationSchema}
         >
@@ -38,7 +41,6 @@ const UpdateEducation: FC<{ values: EducationInterface, close: () => void, updat
                 ({ handleSubmit, values, handleChange, errors, touched, isSubmitting, setValues }) => {
                     return (
                         <form onSubmit={handleSubmit} className='fixed top-0 left-0 h-full w-full bg-[#00000081] z-20 flex justify-center items-center'>
-
                             <div id="default-modal" className="overflow-y-auto overflow-x-hidden z-50 justify-center items-center  md:inset-0">
                                 <div className="relative p-4 w-full max-h-full">
                                     <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">

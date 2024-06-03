@@ -18,22 +18,26 @@ const UpdateExperience: FC<{ values: ExperieneInterfaces, close: () => void, upd
     return (
         <Formik
             onSubmit={(values, { setSubmitting }) => {
-                values.start_date = formatDate(new Date(values.start_date));
-                values.end_date = formatDate(new Date(values.end_date));
-                update({ ...values }).then(() => {
+                let finalValues: ExperieneInterfaces = {
+                    ...values,
+                    end_date: new Date(values.end_date),
+                    start_date: new Date(values.start_date)
+                }
+                update(finalValues).then(() => {
                     setSubmitting(false);
                 })
             }}
             initialValues={{
-                start_date: values.start_date ? formatDate(new Date(values.start_date)) : "",
-                end_date: values.end_date ? formatDate(new Date(values.end_date)) : "",
+                start_date: formatDate(values.start_date ?? new Date()),
+                end_date: formatDate(values.end_date ?? new Date()),
                 employee_type: values.employee_type ?? EmployeeType.FULL_TIME,
-                positioin: values.positioin ?? "",
+                position: values.position ?? "",
                 location: values.location ?? "",
                 title: values.title ?? "",
                 company_name: values.company_name ?? "",
-                exp_id: values.exp_id ?? 1000000000000000,
                 still: values.still,
+                _id: values._id,
+                userid: values.userid
             }}
             validationSchema={validationSchema}
         >

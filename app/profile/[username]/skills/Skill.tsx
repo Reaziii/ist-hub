@@ -4,13 +4,13 @@ import React, { FC, useEffect, useState } from 'react'
 import AddSkill from './AddSkill';
 import handleToast from '@/components/handleToast';
 
-const Skill: FC<{ add: (skill: string) => Promise<ServerMessageInterface>, getSkills: () => Promise<ServerMessageInterface & { skills: SkillInterface[] }>, deleteItem: (skill_id: number) => Promise<ServerMessageInterface> }> = ({ add, getSkills, deleteItem }) => {
+const Skill: FC<{ add: (skill: string) => Promise<ServerMessageInterface>, getSkills: (userid:string) => Promise<ServerMessageInterface & { skills: SkillInterface[] }>, deleteItem: (skill_id: string) => Promise<ServerMessageInterface>, userid:string }> = ({ add, getSkills, deleteItem, userid }) => {
     const [loading, setLoading] = useState(false);
     const [skills, setSkills] = useState<SkillInterface[]>([])
     const handleRetrive = () => {
         setSkills([]);
         setLoading(true);
-        getSkills().then((res) => {
+        getSkills(userid).then((res) => {
             setSkills([...res.skills])
             setLoading(false);
         })
@@ -36,7 +36,7 @@ const Skill: FC<{ add: (skill: string) => Promise<ServerMessageInterface>, getSk
                                             <p>{item.skill}</p>
                                             <button
                                                 onClick={() => {
-                                                    deleteItem(item.skill_id).then(res => {
+                                                    deleteItem(item._id).then(res => {
                                                         handleToast(res);
                                                         handleRetrive();
                                                     })

@@ -9,12 +9,13 @@ import ButtonSpinner from '@/components/ButtonSpinner'
 const Education: FC<
     {
         email: string,
+        userid: string,
         owner: boolean,
         update: (params: EducationInterface) => Promise<ServerMessageInterface>,
-        getEducations?: (email: string) => Promise<ServerMessageInterface & { educations?: EducationInterface[] }>,
+        getEducations?: (userid: string) => Promise<ServerMessageInterface & { educations?: EducationInterface[] }>,
         addNewEducation: (params: EducationInterface) => Promise<ServerMessageInterface>,
-        deleteItem: (id: number) => Promise<ServerMessageInterface>
-    }> = ({ email, addNewEducation, getEducations, update, deleteItem, owner }) => {
+        deleteItem: (id: string) => Promise<ServerMessageInterface>
+    }> = ({ email, addNewEducation, getEducations, update, deleteItem, owner, userid }) => {
         let [educations, setEducations] = useState<EducationInterface[]>([])
         const [loading, setLoading] = useState(true);
         let [openUpdateModal, setOpenUpdateModal] = useState<EducationInterface & { open: null | number }>({
@@ -22,9 +23,12 @@ const Education: FC<
             degree: "",
             school: "",
             grade: 0.0,
-            start_date: Date.now().toString(),
-            end_date: null,
-            still: false
+            start_date: new Date(),
+            end_date: new Date(),
+            still: false,
+            _id: "",
+            userid: ""
+
         });
         let handleUpdate = (id: number) => {
             setOpenUpdateModal({
@@ -37,7 +41,7 @@ const Education: FC<
             if (!getEducations) return;
             setLoading(true);
             setEducations([])
-            let p_education = await getEducations(email)
+            let p_education = await getEducations(userid)
             let _educations: EducationInterface[] | undefined = p_education.educations
             if (_educations === undefined) _educations = [];
             setEducations([..._educations])
@@ -46,9 +50,11 @@ const Education: FC<
                 degree: "",
                 school: "",
                 grade: 0.0,
-                start_date: Date.now().toString(),
-                end_date: null,
-                still: false
+                start_date: new Date(),
+                end_date: new Date(),
+                still: false,
+                _id: "",
+                userid: ""
             })
             setLoading(false);
         }
@@ -62,14 +68,13 @@ const Education: FC<
             await handleRetrive();
         }
         const _handleAdd = async (params: EducationInterface) => {
-            params.edu_id = openUpdateModal.edu_id
             let res = await addNewEducation(params);
             handleToast(res);
             await handleRetrive();
         }
 
         const handleDelete = async () => {
-            let res = await deleteItem(openUpdateModal.edu_id ?? 1000000);
+            let res = await deleteItem(openUpdateModal._id ?? "");
             handleToast(res);
             await handleRetrive();
 

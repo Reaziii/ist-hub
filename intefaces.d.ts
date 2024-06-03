@@ -44,21 +44,22 @@ interface ProfileInterface {
 }
 
 interface ExperieneInterfaces {
-    exp_id?: number,
+    _id: string,
     title: string,
     employee_type: EmployeeType,
-    positioin: string,
+    position: string,
     company_name: string,
-    start_date: string,
-    end_date?: string | null,
+    start_date: Date,
+    end_date: Date,
     location: string,
-    still: boolean
+    still: boolean,
+    userid: string
 }
 
 interface SkillInterface {
     userid: number;
     skill: string;
-    skill_id: number;
+    _id: string;
 }
 
 interface ShowcaseVerifierDetails {
@@ -71,13 +72,16 @@ interface ShowcaseVerifierDetails {
     title: string
 }
 
-interface Showcase {
-    showcase_id: number,
+interface ShowcaseTagInterface {
+    showcase_id : string,
+    tag : string
+}
+
+
+interface ShowcaseInterface {
+    _id: string,
     userid: number,
     name: string,
     description: string,
-    tags: {
-        showcase_id: number,
-        tag: string
-    }[]
+    tags: ShowcaseTag[]
 }

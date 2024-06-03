@@ -4,6 +4,7 @@ import Select from '@/components/SelectInput'
 import Input from '@/components/TextInput'
 import handleToast from '@/components/handleToast'
 import { EmployeeType } from '@/constants'
+import { formatDate } from '@/lib/utils'
 import { Formik } from 'formik'
 import React, { FC, useState } from 'react'
 import * as yup from 'yup'
@@ -18,15 +19,23 @@ const UpdateModal: FC<{ close: () => void, add: (params: ExperieneInterfaces) =>
     return (
         <Formik
             onSubmit={(values, { setSubmitting }) => {
-                add(values).then(() => {
+                let finalValues: ExperieneInterfaces = {
+                    ...values,
+                    end_date: new Date(values.end_date),
+                    start_date: new Date(values.start_date),
+                    userid: "",
+                    _id: ""
+                }
+
+                add(finalValues).then(() => {
                     setSubmitting(false)
                 })
             }}
             initialValues={{
-                start_date: "",
-                end_date: "",
+                start_date: formatDate(new Date()),
+                end_date: formatDate(new Date()),
                 employee_type: EmployeeType.FULL_TIME,
-                positioin: "",
+                position: "",
                 location: "",
                 title: "",
                 company_name: "",

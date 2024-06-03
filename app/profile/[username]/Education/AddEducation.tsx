@@ -2,6 +2,7 @@
 import ButtonSpinner from '@/components/ButtonSpinner'
 import Input from '@/components/TextInput'
 import handleToast from '@/components/handleToast'
+import { formatDate } from '@/lib/utils'
 import { Formik } from 'formik'
 import React, { FC, useState } from 'react'
 import * as yup from 'yup'
@@ -16,7 +17,14 @@ const UpdateModal: FC<{ close: () => void, add: (params: EducationInterface) => 
     return (
         <Formik
             onSubmit={(values, { setSubmitting }) => {
-                add(values).then(() => {
+                let finalValues: EducationInterface = {
+                    ...values,
+                    end_date: new Date(values.end_date),
+                    start_date: new Date(values.start_date),
+                    _id : "",
+                    userid : ""
+                }
+                add(finalValues).then(() => {
                     setSubmitting(false)
                 })
             }}
@@ -24,8 +32,8 @@ const UpdateModal: FC<{ close: () => void, add: (params: EducationInterface) => 
                 school: "",
                 degree: "",
                 grade: 0,
-                start_date: "",
-                end_date: "",
+                start_date: formatDate(new Date()),
+                end_date: formatDate(new Date()),
                 still: false
             }}
             validationSchema={validationSchema}
