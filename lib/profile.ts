@@ -160,7 +160,7 @@ export const addNewShowcase = async (name: string): Promise<ServerMessageInterfa
             name: name
         })
         await newShowcase.save();
-        return { success: true, msg: "Succesfully created new Shwocase", showcase_id: newShowcase._id }
+        return { success: true, msg: "Succesfully created new Shwocase", showcase_id: String(newShowcase._id) }
     } catch (err) {
         console.log(err);
     }

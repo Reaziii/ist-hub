@@ -13,7 +13,7 @@ const validationSchema = yup.object().shape({
 })
 
 
-const Step2: FC<{ updateDetails: (details: string, showcase_id: number) => Promise<ServerMessageInterface>, showcase_id: number }> = ({ updateDetails, showcase_id }) => {
+const Step2: FC<{ updateDetails: (details: string, showcase_id: string) => Promise<ServerMessageInterface>, showcase_id: string }> = ({ updateDetails, showcase_id }) => {
   const history = useRouter();
 
   return (

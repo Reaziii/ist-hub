@@ -13,7 +13,7 @@ const validationSchema = yup.object().shape({
 
 
 
-const Step3: FC<{ updateTags: (tags: string[], showcase_id: number) => Promise<ServerMessageInterface>, showcase_id: number }> = ({ updateTags, showcase_id }) => {
+const Step3: FC<{ updateTags: (tags: string[], showcase_id: string) => Promise<ServerMessageInterface>, showcase_id: string }> = ({ updateTags, showcase_id }) => {
   const history = useRouter();
   const initialValues: { name: string, names: string[] } = {
     name: "",
@@ -27,13 +27,12 @@ const Step3: FC<{ updateTags: (tags: string[], showcase_id: number) => Promise<S
           handleToast(res);
           setSubmitting(false);
           if (res.success) {
-            return history.push("/showcase/create/step-4?showcase_id=" + showcase_id)
+            return history.push("/showcase/details/"+showcase_id)
           }
         })
 
       }}
       initialValues={initialValues}
-
     >
       {
         ({ values, errors, touched, handleChange, isSubmitting, handleSubmit, submitForm, setValues, setErrors, setTouched }) => {
