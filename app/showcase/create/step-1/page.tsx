@@ -1,4 +1,4 @@
-import { addNewShowcase } from '@/lib/profile'
+import { addNewShowcase } from '@/lib/showcases'
 import Step from './Step'
 import React from 'react'
 

@@ -13,14 +13,14 @@ const validationSchema = yup.object().shape({
 
 
 
-const Step1: React.FC<{ addNewShowcase: (name: string) => Promise<ServerMessageInterface & { showcase_id: number }> }> = ({ addNewShowcase }) => {
+const Step1: React.FC<{ addNewShowcase: (name: string) => Promise<ServerMessageInterface & { showcase_id?: string }> }> = ({ addNewShowcase }) => {
   const history = useRouter();
   return (
     <Formik
       onSubmit={(values, { setSubmitting }) => {
         addNewShowcase(values.name).then(res => {
           handleToast(res);
-          if (res.success) {
+          if (res.success && res.showcase_id) {
             history.push("/showcase/create/step-2?showcase_id=" + res.showcase_id)
           }
           setSubmitting(false);

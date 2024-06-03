@@ -1,4 +1,4 @@
-import { updateTagsOfShowcase } from '@/lib/profile'
+import { updateTagsOfShowcase } from '@/lib/showcases'
 import Step from './Step'
 import React from 'react'
 const Page: React.FC<{ searchParams: { showcase_id: number } }> = ({ searchParams: { showcase_id } }) => {

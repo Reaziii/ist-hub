@@ -14,6 +14,8 @@ import * as SkillAPI from '@/lib/skills'
 import * as ExperienceAPI from '@/lib/experience'
 import Experience from './Experience/Experience';
 import Skill from './skills/Skill';
+import Showcase from './showcase/Showcase';
+import { getProfileShowcases } from '@/lib/showcases'
 const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
     let usr = await user();
     let details = await extractEmailAddressAndId(username)
@@ -74,8 +76,14 @@ const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
                     userid={profile.profile._id}
                     addNewExperience={ExperienceAPI.addNewExperience}
                     update={ExperienceAPI.updateAnExperience} />
-                <Skill add={SkillAPI.addNewSkill} getSkills={SkillAPI.getSkills} deleteItem={SkillAPI.deleteASkill} userid={profile.profile._id} />
-                {/* <Showcase userid={profile.profile.userid} getProfileShowcase={getProfileShowcases} /> */}
+                <Skill
+                    add={SkillAPI.addNewSkill}
+                    getSkills={SkillAPI.getSkills}
+                    deleteItem={SkillAPI.deleteASkill}
+                    userid={profile.profile._id} />
+                <Showcase
+                    userid={profile.profile._id}
+                    getProfileShowcase={getProfileShowcases} />
             </div>
         </div>
     )

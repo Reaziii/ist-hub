@@ -5,14 +5,14 @@ import AddShowcase from './AddShowcase';
 import { truncateString } from '@/utilities/string';
 
 interface ShowcaseProps {
-    getProfileShowcase: (userid: number) => Promise<ServerMessageInterface & { showcases: Showcase[] }>,
-    userid: number
+    getProfileShowcase: (userid: string) => Promise<ServerMessageInterface & { showcases: ShowcaseInterface[] }>,
+    userid: string
 }
 
 
 const Showcase: FC<ShowcaseProps> = ({ getProfileShowcase, userid }) => {
     const [loading, setLoading] = useState(false);
-    let [showcases, setShowcases] = useState<Showcase[]>([])
+    let [showcases, setShowcases] = useState<ShowcaseInterface[]>([])
     useEffect(() => {
         getProfileShowcase(userid).then((res) => {
             setShowcases([...res.showcases])
@@ -33,13 +33,13 @@ const Showcase: FC<ShowcaseProps> = ({ getProfileShowcase, userid }) => {
                                     showcases.map((item, key) => (
                                         <div className="mb-[40px]" key={key}>
                                             <h1 className="font-bold">{item.name}</h1>
-                                            <p>{truncateString(item.description, 100)}</p>
+                                            <p>{truncateString(item.description??"", 100)}</p>
 
 
                                             <div className="w-full flex flex-wrap gap-[10px] mt-[10px]">
                                                 {
                                                     item.tags.map((item, key) => (
-                                                        <div className="py-[5px] px-[10px] border rounded-full">
+                                                        <div key={key} className="py-[5px] px-[10px] border rounded-full">
                                                             {item.tag}
                                                         </div>
                                                     ))
