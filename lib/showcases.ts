@@ -109,6 +109,7 @@ export const getShowCaseDetails = async (_id: string): Promise<ServerMessageInte
         if (!showcase) {
             return { success: false, msg: "Showcase doesn't exists", showcase: { name: "", description: "", _id: "", tags: [], userid: "" } }
         }
+        showcase._id = String(showcase._id)
         showcase.tags = await ShowcaseTagModel.find({ showcase_id: showcase._id }).lean()
         showcase.tags = showcase.tags.map((item) => ({ ...item, _id: String(item._id) }))
         return { success: true, msg: "Showcase name fetched successfully", showcase: showcase }
@@ -121,10 +122,17 @@ export const getShowCaseDetails = async (_id: string): Promise<ServerMessageInte
 export const updateShowcaseName = async (_id: string, name: string): Promise<ServerMessageInterface> => {
     "use server"
     try {
+        let usr = await user();
+        if(!usr.usr){
+            return ErrorMessage.UNAUTHORIZED
+        }
         await MongoConn();
         let showcase = await ShowcaseModel.findById(_id);
         if (!showcase) {
             return { success: false, msg: "Showcase doesn't exists" }
+        }
+        if(showcase.userid!==usr.usr._id){
+            return ErrorMessage.UNAUTHORIZED;
         }
         showcase.name = name;
         await showcase.save();

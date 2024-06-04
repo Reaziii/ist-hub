@@ -40,7 +40,8 @@ interface ProfileInterface {
     fullname: string,
     resume: string | null,
     _id : string,
-    owner : boolean
+    owner : boolean,
+    username : string
 }
 
 interface ExperieneInterfaces {
@@ -74,7 +75,8 @@ interface ShowcaseVerifierDetails {
 
 interface ShowcaseTagInterface {
     showcase_id : string,
-    tag : string
+    tag : string,
+    _id : string
 }
 
 
@@ -83,5 +85,5 @@ interface ShowcaseInterface {
     userid: string,
     name: string,
     description: string,
-    tags: ShowcaseTag[]
+    tags: ShowcaseTagInterface[]
 }

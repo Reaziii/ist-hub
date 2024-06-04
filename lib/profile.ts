@@ -64,6 +64,7 @@ export const getProfileDetails = async (userid: string): Promise<ServerMessageIn
             resume: _user.resume,
             _id: String(_user._id),
             owner: usr.usr?._id === _user._id,
+            username : _user.username
         };
         return { success: true, msg: "Profile fetched successfully", profile }
 
