@@ -9,7 +9,7 @@ const CompletedBar: FC<{ done: number }> = ({ done }) => {
                 ))
             }
             {
-                new Array(4 - done).fill(null).map((item, key) => (
+                new Array(3 - done).fill(null).map((item, key) => (
                     <div key={key} className="h-[10px] w-[25%] bg-gray-400 rounded-full" />
                 ))
             }

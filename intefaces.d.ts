@@ -80,7 +80,7 @@ interface ShowcaseTagInterface {
 
 interface ShowcaseInterface {
     _id: string,
-    userid: number,
+    userid: string,
     name: string,
     description: string,
     tags: ShowcaseTag[]

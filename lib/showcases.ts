@@ -100,3 +100,37 @@ export const updateTagsOfShowcase = async (tags: string[], _id: string): Promise
 
     }
 }
+
+export const getShowCaseDetails = async (_id: string): Promise<ServerMessageInterface & { showcase: ShowcaseInterface }> => {
+    "use server"
+    try {
+        await MongoConn();
+        let showcase = await ShowcaseModel.findById(_id).lean()
+        if (!showcase) {
+            return { success: false, msg: "Showcase doesn't exists", showcase: { name: "", description: "", _id: "", tags: [], userid: "" } }
+        }
+        showcase.tags = await ShowcaseTagModel.find({ showcase_id: showcase._id }).lean()
+        showcase.tags = showcase.tags.map((item) => ({ ...item, _id: String(item._id) }))
+        return { success: true, msg: "Showcase name fetched successfully", showcase: showcase }
+    } catch (err) {
+        console.log("showcase name fetch ===> \n", err)
+        return { success: false, msg: "Something went wrong", showcase: { name: "", description: "", _id: "", tags: [], userid: "" } }
+    }
+}
+
+export const updateShowcaseName = async (_id: string, name: string): Promise<ServerMessageInterface> => {
+    "use server"
+    try {
+        await MongoConn();
+        let showcase = await ShowcaseModel.findById(_id);
+        if (!showcase) {
+            return { success: false, msg: "Showcase doesn't exists" }
+        }
+        showcase.name = name;
+        await showcase.save();
+        return { success: true, msg: "Showcase updated successfully" }
+    } catch (err) {
+        console.log("showcase name update ===> \n", err);
+        return { success: false, msg: "Showcase name update failed" }
+    }
+}

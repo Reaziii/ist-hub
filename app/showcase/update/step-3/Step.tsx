@@ -13,11 +13,11 @@ const validationSchema = yup.object().shape({
 
 
 
-const Step3: FC<{ updateTags: (tags: string[], showcase_id: string) => Promise<ServerMessageInterface>, showcase_id: string }> = ({ updateTags, showcase_id }) => {
+const Step3: FC<{ updateTags: (tags: string[], showcase_id: string) => Promise<ServerMessageInterface>, showcase_id: string, tags: ShowcaseTagInterface[] }> = ({ updateTags, showcase_id, tags }) => {
   const history = useRouter();
   const initialValues: { name: string, names: string[] } = {
     name: "",
-    names: [],
+    names: tags.map(item => item.tag),
   }
   return (
     <Formik
@@ -27,7 +27,7 @@ const Step3: FC<{ updateTags: (tags: string[], showcase_id: string) => Promise<S
           handleToast(res);
           setSubmitting(false);
           if (res.success) {
-            return history.push("/showcase/details/"+showcase_id)
+            return history.push("/showcase/details/" + showcase_id)
           }
         })
 
@@ -82,7 +82,7 @@ const Step3: FC<{ updateTags: (tags: string[], showcase_id: string) => Promise<S
                   </button>
                   <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 w-[150px] flex justify-center items-center">
                     {
-                      isSubmitting ? <ButtonSpinner size={20} /> : "NEXT"
+                      isSubmitting ? <ButtonSpinner size={20} /> : "Save"
                     }
                   </button>
                 </div>

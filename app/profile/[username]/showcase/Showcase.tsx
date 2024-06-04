@@ -3,6 +3,7 @@ import ButtonSpinner from '@/components/ButtonSpinner';
 import React, { FC, useEffect, useState } from 'react'
 import AddShowcase from './AddShowcase';
 import { truncateString } from '@/utilities/string';
+import { useRouter } from 'next/navigation';
 
 interface ShowcaseProps {
     getProfileShowcase: (userid: string) => Promise<ServerMessageInterface & { showcases: ShowcaseInterface[] }>,
@@ -13,6 +14,7 @@ interface ShowcaseProps {
 const Showcase: FC<ShowcaseProps> = ({ getProfileShowcase, userid }) => {
     const [loading, setLoading] = useState(false);
     let [showcases, setShowcases] = useState<ShowcaseInterface[]>([])
+    const router = useRouter();
     useEffect(() => {
         getProfileShowcase(userid).then((res) => {
             setShowcases([...res.showcases])
@@ -31,11 +33,13 @@ const Showcase: FC<ShowcaseProps> = ({ getProfileShowcase, userid }) => {
                             <div className='mt-6'>
                                 {
                                     showcases.map((item, key) => (
-                                        <div className="mb-[40px]" key={key}>
+                                        <div onClick={() => {
+                                            router.push("/showcase/details/" + item._id)
+
+
+                                        }} className="mb-[40px] cursor-pointer" key={key}>
                                             <h1 className="font-bold">{item.name}</h1>
-                                            <p>{truncateString(item.description??"", 100)}</p>
-
-
+                                            <p>{truncateString(item.description ?? "", 100)}</p>
                                             <div className="w-full flex flex-wrap gap-[10px] mt-[10px]">
                                                 {
                                                     item.tags.map((item, key) => (
