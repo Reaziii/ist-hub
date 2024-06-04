@@ -16,8 +16,10 @@ const Showcase: FC<ShowcaseProps> = ({ getProfileShowcase, userid }) => {
     let [showcases, setShowcases] = useState<ShowcaseInterface[]>([])
     const router = useRouter();
     useEffect(() => {
+        setLoading(true);
         getProfileShowcase(userid).then((res) => {
             setShowcases([...res.showcases])
+            setLoading(false);
         })
     }, [])
     return (
