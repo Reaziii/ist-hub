@@ -14,7 +14,7 @@ const schema = new mongoose.Schema<UserInterface & Document>({
         default: false,
     },
     username: String,
-    email_verfied: {
+    email_verified: {
         type: Boolean,
         default: false
     },

@@ -20,7 +20,7 @@ const Jobs: React.FC<Props> = ({ getJobs, userid }) => {
        
         <div className="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600 pl-0">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                MY JOBS
+                JOBS
             </h3>
         </div>
         {

@@ -21,22 +21,28 @@ export const registration = async (name: string, email: string, dept: string, ba
         }
 
         let username = `${dept.toString().toLowerCase()}-${batch}-${roll}`;
-        let photo = "";
-        let values = [
-            [name, dept, batch, roll, phone, email, pass, username, photo]
-        ]
-
-
         let data = await UserModel.findOne({
             email_verified: true,
-            $or: [
-                { email: email },
-                { roll_no: roll },
-                { phone: phone }
-            ]
+            email
+        });
+        console.log(data, email)
+        if (data) {
+            return { success: false, msg: "Email already exists" }
+        }
+
+        data = await UserModel.findOne({
+            email_verified: true,
+            phone
         });
         if (data) {
-            return { success: false, msg: "email or roll or phone is already exists" }
+            return { success: false, msg: "Phone number already exists" }
+        }
+        data = await UserModel.findOne({
+            email_verified: true,
+            roll_no: roll
+        });
+        if (data) {
+            return { success: false, msg: "Roll no already exists" }
         }
         await EmailVerificationModel.deleteMany({
             email: email
@@ -97,7 +103,7 @@ export const verifyEmail = async (email: string, code: string): Promise<{ succes
         if (!user) {
             return { success: false, msg: "User doesn't exists" }
         }
-        user.email_verfied = true;
+        user.email_verified = true;
         await user.save();
         await verification.deleteOne();
         return { success: true, msg: "Verified successfully" }
@@ -119,7 +125,7 @@ export const login = async (params: { email: string, password: string }): Promis
         await MongoConn();
         let user = await UserModel.findOne({
             email: params.email,
-            email_verfied: true
+            email_verified: true
 
         })
         if (!user) {
@@ -132,7 +138,6 @@ export const login = async (params: { email: string, password: string }): Promis
         }
 
         let token = (await signNewToken(params.email)).token;
-        if (!token) throw ""
         return { success: true, msg: "Login successfull", token }
 
     } catch (err) {
@@ -148,12 +153,12 @@ export const signNewToken = async (email?: string): Promise<{ token?: string }> 
         if (!email) return {};
         let _user = await UserModel.findOne({
             email,
-            email_verfied: true
+            email_verified: true
         })
         if (!_user) {
             return {}
         }
-        let token = jsonwebtoken.sign({
+        let token = await jsonwebtoken.sign({
             name: _user.fullname,
             email: email,
             photo: _user.photo,
@@ -163,6 +168,7 @@ export const signNewToken = async (email?: string): Promise<{ token?: string }> 
             verified: _user.verified,
             _id: _user._id
         }, process.env.JWTSECRET ?? "ISTHUB")
+        console.log(token)
         cookies().set('token', token as string)
         return { token }
 
@@ -180,7 +186,7 @@ export const forgetpassword = async (form: FormData): Promise<{ success: boolean
             return { success: false, msg: "Email is invalid" }
         }
 
-        let user = await UserModel.findOne({email, email_verfied : true})
+        let user = await UserModel.findOne({email, email_verified : true})
         if(!user){
             return {success : false, msg : "Invalid email address"}
         }

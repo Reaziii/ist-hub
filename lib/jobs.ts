@@ -3,6 +3,7 @@ import MongoConn from "./mongodb"
 import JobTagModel from "@/models/JobTagModel";
 import { user } from "./user";
 import { ErrorMessage } from "@/constants";
+import UserModel from "@/models/UserModel";
 
 
 export const createNewJob = async (params: JobInterface): Promise<ServerMessageInterface & { job_id?: string }> => {
@@ -116,18 +117,22 @@ export const getJobDetails = async (job_id: string): Promise<ServerMessageInterf
     }
 }
 
-export const getProfileJobs = async (userid: string): Promise<ServerMessageInterface & { jobs: JobInterface[] }> => {
+export const getProfileJobs = async (userid: string): Promise<ServerMessageInterface & { jobs: JobInterface[], username: string, fullname: string }> => {
     "use server"
     try {
         await MongoConn();
+        const user = await UserModel.findById(userid);
+        if (!user) {
+            return { success: false, msg: "User not found", jobs: [], username: "", fullname: "" }
+        }
         let jobs = await JobModel.find({ userid }).lean();
         for (let i = 0; i < jobs.length; i++) {
             jobs[i].tags = await JobTagModel.find({ job_id: jobs[i]._id }).lean();
             jobs[i].tags = jobs[i].tags.map((item) => ({ ...item, _id: String(item._id) }));
             jobs[i]._id = String(jobs[i]._id)
         }
-        return { success: true, msg: "Jobs fetched succesfully", jobs }
+        return { success: true, msg: "Jobs fetched succesfully", jobs, username: user.username, fullname: user.fullname }
     } catch (err) {
-        return { success: false, msg: "failed to fetch jobs", jobs: [] }
+        return { success: false, msg: "failed to fetch jobs", jobs: [], username: "", fullname: "" }
     }
 }

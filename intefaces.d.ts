@@ -14,7 +14,7 @@ interface UserInterface {
     photo: string,
     verified: boolean,
     username: string,
-    email_verfied: boolean,
+    email_verified: boolean,
     bio: string,
     about: string,
     resume: string,
