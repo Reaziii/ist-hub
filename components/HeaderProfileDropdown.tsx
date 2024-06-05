@@ -21,10 +21,10 @@ const HeaderProfileDropdown: React.FC<{ user: { name: string, email: string, pho
                         <Link href={`/profile/${user.username}`} className="block px-4 py-2 hover:bg-gray-100  ">Profile</Link>
                     </li>
                     <li>
-                        <a href="#" className="block px-4 py-2 hover:bg-gray-100  ">Settings</a>
+                        <Link href="/jobs/create" className="block px-4 py-2 hover:bg-gray-100  ">Post a job</Link>
                     </li>
                     <li>
-                        <a href="#" className="block px-4 py-2 hover:bg-gray-100  ">Earnings</a>
+                        <Link href="/myjobs" className="block px-4 py-2 hover:bg-gray-100  ">My Jobs</Link>
                     </li>
                     <li>
                         <Link href="/logout" className="block px-4 py-2 hover:bg-gray-100  ">Sign out</Link>

@@ -87,3 +87,22 @@ interface ShowcaseInterface {
     description: string,
     tags: ShowcaseTagInterface[]
 }
+
+interface JobTagInterface{
+    tag:string,
+    _id : string,
+    job_id: string
+}
+
+interface JobInterface{
+    _id: string,
+    title: string,
+    tags: JobTagInterface[],
+    company: string,
+    company_email: string,
+    website: string,
+    address: string,
+    description : string,
+    type : string,
+    userid: string
+}

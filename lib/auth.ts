@@ -199,7 +199,7 @@ export const forgetpassword = async (form: FormData): Promise<{ success: boolean
     }
 }
 
-export const verifyAndChangePassword = async (form: FormData): Promise<{ success: boolean, msg?: string }> => {
+export const verifyAndChangePassword = async (form: FormData): Promise<{ success: boolean, msg: string }> => {
     try {
         let email = form.get("email")
         let password = form.get("password") as string;

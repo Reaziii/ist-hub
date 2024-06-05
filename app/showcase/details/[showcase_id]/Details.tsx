@@ -3,7 +3,6 @@ import Link from 'next/link'
 import React from 'react'
 
 const Details: React.FC<{ details: ShowcaseInterface, userDetails: ProfileInterface, owner: boolean }> = ({ details, userDetails, owner }) => {
-    console.log(details)
     return (
         <div
             className='border border-[#ccc] mt-[20px] rounded-lg p-[40px] overflow-hidden bg-white relative min-h-[100px]'

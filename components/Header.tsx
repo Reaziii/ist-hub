@@ -13,8 +13,6 @@ const Header = async () => {
                         <span className="self-center text-xl font-semibold whitespace-nowrap ">IST HUB</span>
                     </a>
                     <div className="flex items-center lg:order-2">
-
-
                         {
                             usr.usr ? <HeaderProfileDropdown user={usr.usr} /> :
                                 <>

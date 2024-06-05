@@ -10,7 +10,12 @@ export const addNewEducation = async (params: EducationInterface): Promise<Serve
         let usr = await user();
         if (!usr || !usr.login || !usr.usr) return ErrorMessage.UNAUTHORIZED;
         let education = new EducationModel({
-            ...params,
+            school : params.school,
+            degree : params.degree,
+            grade : params.grade,
+            start_date : params.start_date,
+            end_date : params.end_date,
+            still : params.still,
             userid: String(usr.usr._id)
         });
         await education.save();
@@ -53,7 +58,6 @@ export const updateAnEducation = async (params: EducationInterface): Promise<Ser
         const usr = await user();
         if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
         let education = await EducationModel.findById(params._id);
-        console.log("update education === ", education)
         if (!education) {
             return { success: false, msg: "Education doesn't exists" }
         }
