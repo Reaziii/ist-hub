@@ -16,7 +16,13 @@ import Experience from './Experience/Experience';
 import Skill from './skills/Skill';
 import Showcase from './showcase/Showcase';
 import { getProfileShowcases } from '@/lib/showcases'
-const MyProfile: React.FC<{ username: string }> = async ({ username }) => {
+
+interface Props {
+    username: string
+}
+
+
+const MyProfile: React.FC<Props> = async ({ username }) => {
     let usr = await user();
     let details = await extractEmailAddressAndId(username)
     if (!details.email || !details._id) {

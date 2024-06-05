@@ -6,6 +6,11 @@ import { formatDate } from '@/lib/utils'
 import { Formik } from 'formik'
 import React, { FC, useState } from 'react'
 import * as yup from 'yup'
+interface Props {
+    close: () => void,
+    add: (params: EducationInterface) => Promise<void>
+}
+
 const validationSchema = yup.object().shape({
     school: yup.string().required("required").min(10),
     degree: yup.string().required("required").min(3),
@@ -13,7 +18,9 @@ const validationSchema = yup.object().shape({
     end_date: yup.date()
 
 })
-const UpdateModal: FC<{ close: () => void, add: (params: EducationInterface) => Promise<void> }> = ({ close, add }) => {
+
+
+const UpdateModal: FC<Props> = ({ close, add }) => {
     return (
         <Formik
             onSubmit={(values, { setSubmitting }) => {
@@ -21,8 +28,8 @@ const UpdateModal: FC<{ close: () => void, add: (params: EducationInterface) => 
                     ...values,
                     end_date: new Date(values.end_date),
                     start_date: new Date(values.start_date),
-                    _id : "",
-                    userid : ""
+                    _id: "",
+                    userid: ""
                 }
                 add(finalValues).then(() => {
                     setSubmitting(false)
