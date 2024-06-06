@@ -7,11 +7,15 @@ import { useRouter } from 'next/navigation'
 import React from 'react'
 import { ToastContainer } from 'react-toastify'
 import * as yup from 'yup'
+interface Props{ 
+    email: string, 
+    handleVerify: (email: string, code: string) => Promise<{ success: boolean, msg: string }> 
+}
 const CodeVerificationSchema = yup.object().shape({
     code: yup.string().required("Please enter the varification code").min(6, 'Lenght must be 6 character').max(6, 'Length must be 6 character')
 })
 
-const VerifyForm: React.FC<{ email: string, handleVerify: (email: string, code: string) => Promise<{ success: boolean, msg: string }> }> = ({ email, handleVerify }) => {
+const VerifyForm: React.FC<Props> = ({ email, handleVerify }) => {
     const route = useRouter();
     return (
         <Formik

@@ -7,13 +7,16 @@ import React from 'react'
 import * as yup from 'yup'
 import CompletedBar from '../../CompletedBar'
 import handleToast from '@/components/handleToast'
+interface Props{ 
+  addNewShowcase: (name: string) => Promise<ServerMessageInterface & { showcase_id?: string }> 
+}
 const validationSchema = yup.object().shape({
   name: yup.string().required().min(10)
 })
 
 
 
-const Step1: React.FC<{ addNewShowcase: (name: string) => Promise<ServerMessageInterface & { showcase_id?: string }> }> = ({ addNewShowcase }) => {
+const Step1: React.FC<Props> = ({ addNewShowcase }) => {
   const history = useRouter();
   return (
     <Formik

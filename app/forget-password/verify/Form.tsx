@@ -2,7 +2,12 @@
 import handleToast from '@/components/handleToast'
 import { Alert, Snackbar } from '@mui/material'
 import React, { useState } from 'react'
-const Form: React.FC<{ children: React.ReactNode, action?: (form: FormData) => Promise<{ success: boolean, msg: string, token?: string }>, className?: string }> = ({ children, action, className }) => {
+interface Props{
+    children: React.ReactNode, 
+    action?: (form: FormData) => Promise<{ success: boolean, msg: string, token?: string }>,
+    className?: string 
+}
+const Form: React.FC<Props> = ({ children, action, className }) => {
     const handleSubmit = (form: FormData) => {
         action?.call(null, form).then((res) => {
             handleToast(res);

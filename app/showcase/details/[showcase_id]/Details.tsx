@@ -1,8 +1,12 @@
 "use client"
 import Link from 'next/link'
 import React from 'react'
-
-const Details: React.FC<{ details: ShowcaseInterface, userDetails: ProfileInterface, owner: boolean }> = ({ details, userDetails, owner }) => {
+interface Props{ 
+    details: ShowcaseInterface, 
+    userDetails: ProfileInterface, 
+    owner: boolean 
+}
+const Details: React.FC<Props> = ({ details, userDetails, owner }) => {
     return (
         <div
             className='border border-[#ccc] mt-[20px] rounded-lg p-[40px] overflow-hidden bg-white relative min-h-[100px]'

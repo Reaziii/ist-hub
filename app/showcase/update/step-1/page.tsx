@@ -3,8 +3,12 @@ import { FC } from 'react'
 import Step from './Step'
 import React from 'react'
 import Header from '@/components/Header'
-
-const Page: FC<{ searchParams: { showcase_id: string } }> = async ({ searchParams: { showcase_id } }) => {
+interface Props{ 
+    searchParams: {
+        showcase_id: string
+    }
+}
+const Page: FC<Props> = async ({ searchParams: { showcase_id } }) => {
     let showcase = await getShowCaseDetails(showcase_id)
     if (!showcase.success && !showcase.showcase) {
         return <div>Showcase not found</div>

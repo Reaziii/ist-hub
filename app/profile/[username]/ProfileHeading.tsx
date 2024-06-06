@@ -1,6 +1,10 @@
 import React from 'react'
-
-class ProfileHeading extends React.Component<{ name: string, bio: string, children: (name: string, bio: string) => React.ReactNode }> {
+interface Props{ 
+    name: string, 
+    bio: string, 
+    children: (name: string, bio: string) => React.ReactNode 
+}
+class ProfileHeading extends React.Component<Props> {
 
     constructor(props: { name: string, bio: string, children: (name: string, bio: string) => React.ReactNode }) {
         super(props)

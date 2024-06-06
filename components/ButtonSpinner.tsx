@@ -1,6 +1,8 @@
 import React from 'react'
-
-const ButtonSpinner: React.FC<{ size?: number }> = ({ size }) => {
+interface Props{ 
+    size?: number 
+}
+const ButtonSpinner: React.FC<Props> = ({ size }) => {
     return (
         <svg style={{
             height: `${size}px`

@@ -1,6 +1,8 @@
 import React, { FC } from 'react'
-
-const CompletedBar: FC<{ done: number }> = ({ done }) => {
+interface Props{ 
+    done: number 
+}
+const CompletedBar: FC<Props> = ({ done }) => {
     return (
         <div className="absolute w-[500px] top-24 flex items-center">
             {

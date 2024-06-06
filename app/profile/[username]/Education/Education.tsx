@@ -5,17 +5,16 @@ import AddEducation from './AddEducation'
 import UpdateEducation from './UpdateEducation'
 import handleToast from '@/components/handleToast'
 import ButtonSpinner from '@/components/ButtonSpinner'
-
-const Education: FC<
-    {
-        email: string,
-        userid: string,
-        owner: boolean,
-        update: (params: EducationInterface) => Promise<ServerMessageInterface>,
-        getEducations?: (userid: string) => Promise<ServerMessageInterface & { educations?: EducationInterface[] }>,
-        addNewEducation: (params: EducationInterface) => Promise<ServerMessageInterface>,
-        deleteItem: (id: string) => Promise<ServerMessageInterface>
-    }> = ({ email, addNewEducation, getEducations, update, deleteItem, owner, userid }) => {
+interface Props{
+    email: string,
+    userid: string,
+    owner: boolean,
+    update: (params: EducationInterface) => Promise<ServerMessageInterface>,
+    getEducations?: (userid: string) => Promise<ServerMessageInterface & { educations?: EducationInterface[] }>,
+    addNewEducation: (params: EducationInterface) => Promise<ServerMessageInterface>,
+    deleteItem: (id: string) => Promise<ServerMessageInterface>
+}
+const Education: FC<Props> = ({ email, addNewEducation, getEducations, update, deleteItem, owner, userid }) => {
         let [educations, setEducations] = useState<EducationInterface[]>([])
         const [loading, setLoading] = useState(true);
         let [openUpdateModal, setOpenUpdateModal] = useState<EducationInterface & { open: null | number }>({

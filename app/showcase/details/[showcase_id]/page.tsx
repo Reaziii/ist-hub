@@ -4,7 +4,10 @@ import { getShowCaseDetails } from '@/lib/showcases';
 import React from 'react'
 import Details from './Details';
 import { user } from '@/lib/user';
-const ShowcaseDetails: React.FC<{ params: { showcase_id: string } }> = async ({ params: { showcase_id } }) => {
+interface Props{ 
+    params: { showcase_id: string } 
+}
+const ShowcaseDetails: React.FC<Props> = async ({ params: { showcase_id } }) => {
     const showcase = await getShowCaseDetails(showcase_id)
     if (!showcase.success || !showcase.showcase) {
         return <div>Showcase not found</div>

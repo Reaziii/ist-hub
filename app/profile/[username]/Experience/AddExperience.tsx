@@ -8,6 +8,10 @@ import { formatDate } from '@/lib/utils'
 import { Formik } from 'formik'
 import React, { FC, useState } from 'react'
 import * as yup from 'yup'
+interface Props{ 
+    close: () => void, 
+    add: (params: ExperieneInterfaces) => Promise<void> 
+}
 const validationSchema = yup.object().shape({
     company_name: yup.string().required("required").min(10),
     title: yup.string().required("Title date is required"),
@@ -15,7 +19,7 @@ const validationSchema = yup.object().shape({
     start_date: yup.date().required(),
 
 })
-const UpdateModal: FC<{ close: () => void, add: (params: ExperieneInterfaces) => Promise<void> }> = ({ close, add }) => {
+const UpdateModal: FC<Props> = ({ close, add }) => {
     return (
         <Formik
             onSubmit={(values, { setSubmitting }) => {
