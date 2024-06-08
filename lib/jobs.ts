@@ -2,8 +2,9 @@ import JobModel from "@/models/JobModel";
 import MongoConn from "./mongodb"
 import JobTagModel from "@/models/JobTagModel";
 import { user } from "./user";
-import { ErrorMessage } from "@/constants";
+import { EmployeeType, ErrorMessage } from "@/constants";
 import UserModel from "@/models/UserModel";
+import { PipelineStage } from "mongoose";
 
 
 export const createNewJob = async (params: JobInterface): Promise<ServerMessageInterface & { job_id?: string }> => {
@@ -23,7 +24,8 @@ export const createNewJob = async (params: JobInterface): Promise<ServerMessageI
             address: params.address,
             description: params.description,
             type: params.type,
-            userid: usr.usr._id
+            userid: usr.usr._id,
+            isActive: params.isActive
         })
         await job.save();
         for (let i = 0; i < params.tags.length; i++) {
@@ -54,6 +56,7 @@ export const updateJob = async (params: JobInterface): Promise<ServerMessageInte
         if (!job || job.userid !== usr.usr._id) {
             return ErrorMessage.UNAUTHORIZED
         }
+        console.log(params)
         job.title = params.title;
         job.company = params.company;
         job.company_email = params.company_email;
@@ -62,6 +65,7 @@ export const updateJob = async (params: JobInterface): Promise<ServerMessageInte
         job.description = params.description;
         job.type = params.type;
         job.userid = usr.usr._id;
+        job.isActive = params.isActive
         await job.save();
         await JobTagModel.deleteMany({ job_id: job._id })
         for (let i = 0; i < params.tags.length; i++) {
@@ -79,25 +83,7 @@ export const updateJob = async (params: JobInterface): Promise<ServerMessageInte
     }
 }
 
-export const deleteJob = async (job_id: string): Promise<ServerMessageInterface> => {
-    "use server";
-    try {
-        let usr = await user();
-        if (!usr.usr) {
-            return ErrorMessage.UNAUTHORIZED;
-        }
-        await MongoConn();
-        let job = await JobModel.findById(job_id);
-        if (!job || job.userid !== usr.usr._id) {
-            return ErrorMessage.UNAUTHORIZED
-        }
-        await job.deleteOne();
-        return { success: true, msg: "Job deleted successfully" }
-    } catch (err) {
-        console.log("delete job failed ===> \n", err)
-        return { success: false, msg: "Failed to delete the job" }
-    }
-}
+
 
 export const getJobDetails = async (job_id: string): Promise<ServerMessageInterface & { job?: JobInterface }> => {
     "use server"
@@ -135,4 +121,126 @@ export const getProfileJobs = async (userid: string): Promise<ServerMessageInter
     } catch (err) {
         return { success: false, msg: "failed to fetch jobs", jobs: [], username: "", fullname: "" }
     }
+}
+
+export const deleteJob = async (job_id: string): Promise<ServerMessageInterface> => {
+    "use server"
+    try {
+        await MongoConn();
+        const usr = await user();
+        if (!usr.usr) {
+            return ErrorMessage.UNAUTHORIZED;
+        }
+        let job = await JobModel.findById(job_id);
+        if (!job || job.userid !== usr.usr._id) {
+            return ErrorMessage.UNAUTHORIZED;
+        }
+        await JobTagModel.deleteMany({ job_id })
+        await job.deleteOne();
+        return { success: true, msg: "Job deleted successfully" }
+    } catch (err) {
+        console.log("deleting job ===> \n", err)
+        return { success: false, msg: "Failed to delete job" }
+    }
+}
+
+
+
+
+export const getPaginatedJobs = async (page: number = 1, limit: number = 10): Promise<ServerMessageInterface & { jobs: JobInterfaceWithUserData[] }> => {
+    "use server"
+    try {
+        await MongoConn()
+        const skip = (page - 1) * limit;
+        const jobs = await JobModel.find({
+            isActive: true
+        })
+            .sort({ createdAt: 1 })
+            .skip(skip)
+            .limit(limit)
+            .lean();
+
+        for (let i = 0; i < jobs.length; i++) {
+            jobs[i].tags = await JobTagModel.find({ job_id: jobs[i]._id }).lean();
+            jobs[i].tags = jobs[i].tags.map((item) => ({ ...item, _id: String(item._id) }));
+            jobs[i]._id = String(jobs[i]._id)
+        }
+
+        let ret: JobInterfaceWithUserData[] = [];
+        for (let i = 0; i < jobs.length; i++) {
+            let user = await UserModel.findById(jobs[i].userid);
+            if (!user) throw "";
+            ret[i] = {
+                ...jobs[i],
+                username: user.username,
+                fullname: user.fullname
+            }
+        }
+
+
+
+        return { success: true, msg: "retrived jobs", jobs: ret };
+    } catch (error) {
+        console.error('Error fetching paginated jobs:', error);
+        return { success: false, msg: "Failed to retrive", jobs: [] }
+    }
+};
+
+
+export const searchJobs = async (tags: string[], type: string): Promise<ServerMessageInterface & { jobs: any[] }> => {
+    "use server"
+    try {
+        // console.log("[searching...]")
+        // await MongoConn();
+        // let pipeline: PipelineStage[] = []
+        // pipeline.push({
+        //     $match: {
+        //         isActive: true,
+        //         type: type
+        //     }
+        // })
+        // pipeline.push({
+        //     $addFields: {
+        //         "id": { $toString: "$_id" }
+        //     }
+        // })
+        // pipeline.push(
+        //     {
+        //         $lookup: {
+        //             from: 'jobtags',
+        //             localField : "id",
+        //             foreignField : "job_id",
+        //             as: 'tags',
+
+        //             pipeline : [
+        //                 {
+        //                     $unwind : "$tags"
+        //                 },
+        //                 {
+        //                     $group : {
+        //                         $tags: { $push : "$tag"}
+        //                     }
+        //                 }
+        //             ]
+        //         }
+        //     },
+        //     {
+        //         $project: {
+        //             title: 1,
+        //             description: 1,
+        //             tags: 1 // Extract the 'tags' array from the object
+        //         }
+        //     }
+        // )
+
+        // let jobs = await JobModel.aggregate<any[]>(pipeline);
+        // jobs = jobs.map(item=>({...item,_id : String(item._id)}))
+        // return {success : true, msg : "asdfasdf", jobs}
+    } catch (err) {
+        console.log(err);
+        console.log("search failed")
+
+    }
+
+    return { success: false, msg: "Failed to retrive", jobs: [] }
 }

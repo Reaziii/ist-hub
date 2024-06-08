@@ -1,15 +1,27 @@
 import { cookies } from "next/headers"
 import jwt from 'jsonwebtoken'
-import conn from "./mysql";
 import UserModel from "@/models/UserModel";
 import MongoConn from "./mongodb";
 
 export const user = async (): Promise<{ login: boolean, usr?: { name: string, email: string, photo: string, username: string, _id: string } }> => {
     let token = cookies().get("token");
+
     try {
         if (!token) throw "";
         let details = jwt.verify(token.value, process.env.JWTSECRET ?? "ISTHUB") as { name: string, email: string, photo: string, username: string, _id: string };
-        return { login: true, usr: details }
+        await MongoConn();
+        let _details = await UserModel.findById(details._id).lean();
+        if (!_details) throw "";
+        return {
+            login: true, usr: {
+                name: _details.fullname,
+                email: _details.email,
+                photo: _details.photo,
+                username: _details.username,
+                _id: details._id
+
+            }
+        }
     }
     catch (err) {
         return { login: false }

@@ -26,7 +26,7 @@ interface Props {
 }
 
 const CreateJobForm: React.FC<Props> = ({ create }) => {
-    let inititalValues: JobInterface & { tempTag: string } = {
+    let inititalValues: JobInterface & { tempTag: string, _isActive: "YES" | "NO" } = {
         title: "",
         description: "",
         userid: "",
@@ -37,7 +37,11 @@ const CreateJobForm: React.FC<Props> = ({ create }) => {
         type: EmployeeType.FULL_TIME,
         tags: [],
         tempTag: "",
-        address: ""
+        address: "",
+        isActive: true,
+        _isActive: "YES",
+        createdAt: new Date(),
+        updatedAt : new Date()
 
     }
     return (
@@ -52,7 +56,7 @@ const CreateJobForm: React.FC<Props> = ({ create }) => {
                 initialValues={inititalValues}
                 onSubmit={(values, { setSubmitting }) => {
                     create(values).then(res => {
-                        console.log(res);
+                        values.isActive = values._isActive === "YES"
                         handleToast(res)
                         setSubmitting(false)
                         if (res.success) {
@@ -88,12 +92,12 @@ const CreateJobForm: React.FC<Props> = ({ create }) => {
                             <p className="mt-[20px] font-bold">
                                 Desciptioin of the job
                             </p>
-                            <TextArea name="description" value={values.description} error={errors.description} onChange={handleChange} show={touched.description ? true : false} className="w-full mt-[10px] h-[200px]" placeholder="Title of the job" />
+                            <TextArea name="description" value={values.description} error={errors.description} onChange={handleChange} show={touched.description ? true : false} className="w-full mt-[10px] h-[200px]" placeholder="Write the description and requirements" />
 
                             <p className="mt-[20px] font-bold">
                                 Tags of the job
                             </p>
-                            <div className='border h-[100px] border-gray-300 rounded-lg mb-10 p-2 flex flex-wrap gap-1 overflow-y-scroll mt-[10px]'>
+                            <div className='border h-[100px] border-gray-300 rounded-lg mb-2 p-2 flex flex-wrap gap-1 overflow-y-scroll mt-[10px]'>
                                 {
                                     values.tags.map((item, key) => (<p key={key}
                                         className='border w-auto px-3 h-[30px] flex items-center rounded-full bg-gray-200 border-gray-300'
@@ -127,11 +131,11 @@ const CreateJobForm: React.FC<Props> = ({ create }) => {
                             <p className="mt-[20px] font-bold">
                                 Company name
                             </p>
-                            <TextInput name="company" value={values.company} error={errors.company} onChange={handleChange} show={touched.company ? true : false} className="w-full mt-[10px]" placeholder="Title of the job" />
+                            <TextInput name="company" value={values.company} error={errors.company} onChange={handleChange} show={touched.company ? true : false} className="w-full mt-[10px]" placeholder="Name of the company" />
                             <p className="mt-[20px] font-bold">
                                 Company email
                             </p>
-                            <TextInput name="company_email" value={values.company_email} error={errors.company_email} onChange={handleChange} show={touched.company_email ? true : false} className="w-full mt-[10px]" placeholder="Title of the job" />
+                            <TextInput name="company_email" value={values.company_email} error={errors.company_email} onChange={handleChange} show={touched.company_email ? true : false} className="w-full mt-[10px]" placeholder="Email of the company" />
                             <p className="mt-[20px] font-bold">
                                 Company Website
                             </p>
@@ -159,6 +163,23 @@ const CreateJobForm: React.FC<Props> = ({ create }) => {
                                 <option value={EmployeeType.FULL_TIME}>{EmployeeType.FULL_TIME}</option>
                                 <option value={EmployeeType.FREELANCE}>{EmployeeType.FREELANCE}</option>
                                 <option value={EmployeeType.INTERNSHIP}>{EmployeeType.INTERNSHIP}</option>
+                            </Select>
+
+                            <p className="mt-[20px] font-bold">
+                                Is Active?
+                            </p>
+
+                            <Select
+                                show={touched._isActive ? true : false}
+                                value={values._isActive}
+                                name='_isActive'
+                                error={errors._isActive}
+                                required
+                                onChange={handleChange}
+                                className="mt-[10px]"
+                            >
+                                <option value={"YES"}>{"YES"}</option>
+                                <option value={"NO"}>{"NO"}</option>
                             </Select>
 
                             <div className="mt-[30px] flex items-center p-5 pl-0 border-t border-gray-200 rounded-b dark:border-gray-600 pl-[0px]">

@@ -1,4 +1,5 @@
 "use client"
+import ShowTextAreaText from '@/components/ShowTextAreaText'
 import Link from 'next/link'
 import React from 'react'
 
@@ -26,7 +27,8 @@ const Details: React.FC<{ details: ShowcaseInterface, userDetails: ProfileInterf
                     ))
                 }
             </div>
-            <div className="mt-[20px]">{details.description}</div>
+            <br />
+            <ShowTextAreaText text={details.description} />
 
         </div>
     )

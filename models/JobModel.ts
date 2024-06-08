@@ -9,8 +9,17 @@ const Schema = new mongoose.Schema<JobInterface & mongoose.Document>({
     website: String,
     address: String,
     type: String,
-    userid : String
-})
+    userid: String,
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+    createdAt: Date,
+    updatedAt : Date
+},
+    {
+        timestamps: true
+    })
 
 
 export default (mongoose.models.jobs || mongoose.model("jobs", Schema)) as mongoose.Model<JobInterface & mongoose.Document>

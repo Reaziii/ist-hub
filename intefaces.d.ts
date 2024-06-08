@@ -104,5 +104,13 @@ interface JobInterface{
     address: string,
     description : string,
     type : string,
-    userid: string
+    userid: string,
+    isActive : boolean,
+    createdAt : Date,
+    updatedAt : Date
+}
+
+interface JobInterfaceWithUserData extends JobInterface {
+    username: string,
+    fullname: string
 }
