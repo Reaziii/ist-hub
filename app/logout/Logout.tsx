@@ -1,7 +1,9 @@
 "use client"
 import React , {FC, useEffect} from 'react'
-
-const Logout:FC<{logout: ()=>Promise<void>}> = ({logout}) => {
+interface Props{
+  logout: ()=>Promise<void>
+}
+const Logout:FC<Props> = ({logout}) => {
     
     useEffect(()=>{
         logout().then(()=>{

@@ -13,12 +13,15 @@ interface LoginProps {
     password: string,
     remember: boolean
 }
+interface Props{ 
+    login: (params: { email: string, password: string }) => Promise<{ success: boolean, msg: string, token?: string }> 
+}
 const schema = yup.object().shape({
     email: yup.string().email('Invalid email format').required('Email is required'),
     password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
     remember: yup.boolean().default(false),
 });
-const LoginForm: React.FC<{ login: (params: { email: string, password: string }) => Promise<{ success: boolean, msg: string, token?: string }> }> = ({ login }) => {
+const LoginForm: React.FC<Props> = ({ login }) => {
     let initialValues: LoginProps = {
         email: "",
         password: "",

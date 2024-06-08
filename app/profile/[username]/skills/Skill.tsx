@@ -3,8 +3,12 @@ import ButtonSpinner from '@/components/ButtonSpinner';
 import React, { FC, useEffect, useState } from 'react'
 import AddSkill from './AddSkill';
 import handleToast from '@/components/handleToast';
-
-const Skill: FC<{ add: (skill: string) => Promise<ServerMessageInterface>, getSkills: (userid:string) => Promise<ServerMessageInterface & { skills: SkillInterface[] }>, deleteItem: (skill_id: string) => Promise<ServerMessageInterface>, userid:string }> = ({ add, getSkills, deleteItem, userid }) => {
+interface Props{ 
+    add: (skill: string) => Promise<ServerMessageInterface>, 
+    getSkills: (userid:string) => Promise<ServerMessageInterface & { skills: SkillInterface[] }>, 
+    deleteItem: (skill_id: string) => Promise<ServerMessageInterface>, userid:string 
+}
+const Skill: FC<Props> = ({ add, getSkills, deleteItem, userid }) => {
     const [loading, setLoading] = useState(false);
     const [skills, setSkills] = useState<SkillInterface[]>([])
     const handleRetrive = () => {

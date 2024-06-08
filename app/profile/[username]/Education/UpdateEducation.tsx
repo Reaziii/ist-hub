@@ -5,6 +5,11 @@ import { Formik } from 'formik'
 import Input from '@/components/TextInput'
 import ButtonSpinner from '@/components/ButtonSpinner'
 import { formatDate } from '@/lib/utils'
+interface Props{ 
+    values: EducationInterface, 
+    close: () => void, update: (params: EducationInterface) => Promise<void>, 
+    deleteItem: () => Promise<void> 
+}
 const validationSchema = yup.object().shape({
     school: yup.string().required("required").min(10),
     degree: yup.string().required("required").min(3),
@@ -12,7 +17,7 @@ const validationSchema = yup.object().shape({
     end_date: yup.date()
 
 })
-const UpdateEducation: FC<{ values: EducationInterface, close: () => void, update: (params: EducationInterface) => Promise<void>, deleteItem: () => Promise<void> }> = ({ close, update, values, deleteItem }) => {
+const UpdateEducation: FC<Props> = ({ close, update, values, deleteItem }) => {
     return (
         <Formik
             onSubmit={(values, { setSubmitting }) => {

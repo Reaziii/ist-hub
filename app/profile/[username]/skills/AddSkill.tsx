@@ -5,11 +5,16 @@ import handleToast from '@/components/handleToast'
 import { Formik } from 'formik'
 import React, { FC, useState } from 'react'
 import * as yup from 'yup'
+interface Props{ 
+    close: () => void, 
+    add: (skill: string) => Promise<ServerMessageInterface>, 
+    handleRetrive: () => void 
+}
 const validationSchema = yup.object().shape({
     skill: yup.string().required("required"),
 
 })
-const UpdateModal: FC<{ close: () => void, add: (skill: string) => Promise<ServerMessageInterface>, handleRetrive: () => void }> = ({ close, add, handleRetrive }) => {
+const UpdateModal: FC<Props> = ({ close, add, handleRetrive }) => {
     return (
         <Formik
             onSubmit={(values, { setSubmitting }) => {

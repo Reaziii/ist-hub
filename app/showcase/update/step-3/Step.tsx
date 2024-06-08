@@ -7,13 +7,18 @@ import React, { FC } from 'react'
 import * as yup from 'yup'
 import CompletedBar from '../../CompletedBar'
 import handleToast from '@/components/handleToast'
+interface Props{ 
+  updateTags: ( tags: string[], showcase_id: string) => Promise<ServerMessageInterface>, 
+    showcase_id: string, 
+    tags: ShowcaseTagInterface[] 
+}
 const validationSchema = yup.object().shape({
   name: yup.string().required().min(10)
 })
 
 
 
-const Step3: FC<{ updateTags: (tags: string[], showcase_id: string) => Promise<ServerMessageInterface>, showcase_id: string, tags: ShowcaseTagInterface[] }> = ({ updateTags, showcase_id, tags }) => {
+const Step3: FC<Props> = ({ updateTags, showcase_id, tags }) => {
   const history = useRouter();
   const initialValues: { name: string, names: string[] } = {
     name: "",

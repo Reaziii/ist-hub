@@ -2,8 +2,12 @@
 import ButtonSpinner from '@/components/ButtonSpinner';
 import handleToast from '@/components/handleToast';
 import React, { useRef, useState } from 'react'
-
-const ProfilePicture: React.FC<{ dp: string, owner: boolean, uploadImage: (form: FormData) => Promise<ServerMessageInterface & { img?: string }> }> = ({ dp, uploadImage, owner }) => {
+interface Props{ 
+  dp: string, 
+  owner: boolean, 
+  uploadImage: (form: FormData) => Promise<ServerMessageInterface & { img?: string }> 
+}
+const ProfilePicture: React.FC<Props> = ({ dp, uploadImage, owner }) => {
   const [picture, setPicture] = useState(dp);
   const [loading, setLoading] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null);

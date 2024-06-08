@@ -6,7 +6,6 @@ type props = {
     name?: string | undefined,
     type?: string,
     required?: boolean
-
 }
 const Input: FC<props> = ({ className, placeholder, value, name, type, required }) => {
     return (

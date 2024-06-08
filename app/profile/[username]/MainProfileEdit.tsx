@@ -5,11 +5,19 @@ import handleToast from '@/components/handleToast'
 import { Formik } from 'formik'
 import React, { FC, useState } from 'react'
 import * as yup from 'yup'
+interface Props{ 
+    params: { 
+        name: string, 
+        bio: string 
+    }, 
+    open: boolean, close: () => void, 
+    update: (name: string, bio: string) => Promise<ServerMessageInterface & { token?: string }> 
+}
 const validationSchema = yup.object().shape({
     name: yup.string().required("Name is required").min(4),
     bio: yup.string().required("Bio is required").min(20),
 })
-const UpdateModal: FC<{ params: { name: string, bio: string }, open: boolean, close: () => void, update: (name: string, bio: string) => Promise<ServerMessageInterface & { token?: string }> }> = ({ open, close, update, params }) => {
+const UpdateModal: FC<Props> = ({ open, close, update, params }) => {
     return (
         <Formik
             onSubmit={(values, { setSubmitting }) => {

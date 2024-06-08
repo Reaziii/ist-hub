@@ -9,6 +9,18 @@ import { useRouter } from 'next/navigation'
 import React from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 import * as yup from 'yup'
+interface Props{ 
+    handleRegistration: (
+        name: string, 
+        email: string, 
+        dept: string, 
+        batch: number, 
+        roll: number, 
+        phone: string, 
+        pass: string, 
+        conPass: string
+    ) => Promise<{ success: boolean, msg: string }> 
+}
 interface RegistrationInterface {
     name: string,
     email: string,
@@ -32,7 +44,7 @@ const registrationSchema = yup.object().shape({
 });
 
 
-const RegistrationForm: React.FC<{ handleRegistration: (name: string, email: string, dept: string, batch: number, roll: number, phone: string, pass: string, conPass: string) => Promise<{ success: boolean, msg: string }> }> = ({ handleRegistration }) => {
+const RegistrationForm: React.FC<Props> = ({ handleRegistration }) => {
     let initialValues: RegistrationInterface = {
         name: "Reaz Ahammed",
         email: "baphonreaz@gmail.com",

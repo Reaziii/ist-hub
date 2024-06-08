@@ -4,8 +4,12 @@ import React from 'react'
 import Form from './Form'
 import VerifyForm from './VerifyForm'
 import { verifyEmail } from '@/lib/auth'
-
-const Verify: React.FC<{ searchParams?: { [key: string]: string | string[] | undefined } }> = ({ searchParams }) => {
+interface Props{ 
+    searchParams?: { 
+        [key: string]: string | string[] | undefined 
+    } 
+}
+const Verify: React.FC<Props> = ({ searchParams }) => {
     let email = searchParams?.email || null;
     if (!email) {
         redirect("/")

@@ -7,13 +7,17 @@ import React, { FC } from 'react'
 import { useRouter } from 'next/navigation'
 import CompletedBar from '../../CompletedBar'
 import handleToast from '@/components/handleToast'
-
+interface Props{ 
+  updateDetails: (details: string, showcase_id: string) => Promise<ServerMessageInterface>, 
+  showcase_id: string, 
+  description:string 
+}
 const validationSchema = yup.object().shape({
   description: yup.string().required("required").min(20),
 })
 
 
-const Step2: FC<{ updateDetails: (details: string, showcase_id: string) => Promise<ServerMessageInterface>, showcase_id: string, description:string }> = ({ updateDetails, showcase_id, description }) => {
+const Step2: FC<Props> = ({ updateDetails, showcase_id, description }) => {
   const history = useRouter();
   return (
     <Formik

@@ -1,8 +1,12 @@
 import NotUpdated from '@/components/NotUpdated';
 import React from 'react'
 import AboutUpdate from './AboutUpdate';
-
-const About: React.FC<{ owner: boolean, about: string, update: (about: string) => Promise<ServerMessageInterface> }> = ({ about, update, owner }) => {
+interface Props{ 
+    owner: boolean, 
+    about: string, 
+    update: (about: string) => Promise<ServerMessageInterface> 
+}
+const About: React.FC<Props> = ({ about, update, owner }) => {
     let pr = about.split('\n');
     return (
         <div className='border border-[#ccc] mt-[20px] rounded-lg p-[40px] overflow-hidden bg-white relative'>

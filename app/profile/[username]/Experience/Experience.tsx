@@ -6,15 +6,15 @@ import ButtonSpinner from '@/components/ButtonSpinner'
 import { EmployeeType } from '@/constants'
 import AddExperience from './AddExperience'
 import UpdateExperience from './UpdateExperience'
-const Experience: FC<
-    {
-        userid: string,
-        owner: boolean,
-        update: (params: ExperieneInterfaces) => Promise<ServerMessageInterface>,
-        getExperinces: (userid: string) => Promise<ServerMessageInterface & { experiences?: ExperieneInterfaces[] }>,
-        addNewExperience: (params: ExperieneInterfaces) => Promise<ServerMessageInterface>,
-        deleteItem: (id: string) => Promise<ServerMessageInterface>
-    }> = ({ userid, getExperinces, addNewExperience, update, deleteItem, owner }) => {
+interface Props{
+    userid: string,
+    owner: boolean,
+    update: (params: ExperieneInterfaces) => Promise<ServerMessageInterface>,
+    getExperinces: (userid: string) => Promise<ServerMessageInterface & { experiences?: ExperieneInterfaces[] }>,
+    addNewExperience: (params: ExperieneInterfaces) => Promise<ServerMessageInterface>,
+    deleteItem: (id: string) => Promise<ServerMessageInterface>
+}
+const Experience: FC<Props> = ({ userid, getExperinces, addNewExperience, update, deleteItem, owner }) => {
         let [experiences, setExperiences] = useState<ExperieneInterfaces[]>([])
         const [loading, setLoading] = useState(true);
         let [openUpdateModal, setOpenUpdateModal] = useState<ExperieneInterfaces & { open: null | number }>({

@@ -3,8 +3,12 @@ import ButtonSpinner from '@/components/ButtonSpinner'
 import handleToast from '@/components/handleToast'
 import { Formik } from 'formik'
 import React, { FC, useRef, useState } from 'react'
-
-const UploadResume: FC<{ close: () => void, upload: (file: FormData) => Promise<ServerMessageInterface>, resume: string | null }> = ({ close, upload, resume }) => {
+interface Props{ 
+    close: () => void, 
+    upload: (file: FormData) => Promise<ServerMessageInterface>, 
+    resume: string | null 
+}
+const UploadResume: FC<Props> = ({ close, upload, resume }) => {
     const fileref = useRef<HTMLInputElement>(null);
     return (
         <Formik

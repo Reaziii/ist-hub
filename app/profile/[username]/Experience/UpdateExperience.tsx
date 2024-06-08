@@ -7,6 +7,12 @@ import ButtonSpinner from '@/components/ButtonSpinner'
 import { EmployeeType } from '@/constants'
 import Select from '@/components/SelectInput'
 import { formatDate } from '@/lib/utils'
+interface Props{ 
+    values: ExperieneInterfaces, 
+    close: () => void, 
+    update: (params: ExperieneInterfaces) => Promise<void>, 
+    deleteItem: () => Promise<void> 
+}
 const validationSchema = yup.object().shape({
     company_name: yup.string().required("required").min(10),
     title: yup.string().required("Title date is required"),
@@ -14,7 +20,7 @@ const validationSchema = yup.object().shape({
     start_date: yup.date().required(),
 
 })
-const UpdateExperience: FC<{ values: ExperieneInterfaces, close: () => void, update: (params: ExperieneInterfaces) => Promise<void>, deleteItem: () => Promise<void> }> = ({ close, update, values, deleteItem }) => {
+const UpdateExperience: FC<Props> = ({ close, update, values, deleteItem }) => {
     return (
         <Formik
             onSubmit={(values, { setSubmitting }) => {

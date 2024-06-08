@@ -1,8 +1,15 @@
 "use client"
 import Link from 'next/link';
 import React, { MutableRefObject, useEffect, useRef, useState } from 'react'
-
-const HeaderProfileDropdown: React.FC<{ user: { name: string, email: string, photo: string, username: string } }> = ({ user }) => {
+interface Props{ 
+    user: { 
+        name: string, 
+        email: string, 
+        photo: string, 
+        username: string 
+    } 
+}
+const HeaderProfileDropdown: React.FC<Props> = ({ user }) => {
     const [open, setOPen] = useState(false);
 
     return (
