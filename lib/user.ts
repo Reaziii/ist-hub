@@ -2,8 +2,10 @@ import { cookies } from "next/headers"
 import jwt from 'jsonwebtoken'
 import UserModel from "@/models/UserModel";
 import MongoConn from "./mongodb";
+import { ErrorMessage } from "@/constants";
+import UserVerifier from "@/models/UserVerifier";
 
-export const user = async (): Promise<{ login: boolean, usr?: { name: string, email: string, photo: string, username: string, _id: string } }> => {
+export const user = async (): Promise<{ login: boolean, usr?: { name: string, email: string, photo: string, username: string, _id: string, verified: boolean } }> => {
     let token = cookies().get("token");
 
     try {
@@ -18,7 +20,8 @@ export const user = async (): Promise<{ login: boolean, usr?: { name: string, em
                 email: _details.email,
                 photo: _details.photo,
                 username: _details.username,
-                _id: details._id
+                _id: details._id,
+                verified: _details.verified
 
             }
         }
@@ -67,4 +70,42 @@ export const extractEmailAddressAndId = async (username: string): Promise<Server
 
 export const updateProfilePicture = (form: FormData) => {
 
+}
+
+export const verifyUser = async (userid: string): Promise<ServerMessageInterface> => {
+    "use server"
+    try {
+        await MongoConn();
+        let usr = await user();
+        if (!usr.usr) {
+            return ErrorMessage.UNAUTHORIZED
+        }
+        let _user = await UserModel.findById(usr.usr._id);
+        if (!_user) {
+            return ErrorMessage.UNAUTHORIZED
+        }
+        if (!_user.verified) {
+            return { success: false, msg: "You are not allowed to verify an user" }
+        }
+        _user = await UserModel.findById(userid);
+        if (!_user) {
+            return { success: false, msg: "User not found" }
+        }
+        _user.verified = true;
+        await _user.save();
+        let verifier = new UserVerifier({
+            owner: userid,
+            verifiedAt: new Date(),
+            verfier: usr.usr._id
+        })
+        await verifier.save();
+        return { success: true, msg: "Thanks for verifying the user!" }
+
+    } catch (err) {
+        console.log("verify user failed ===> \n", err)
+    }
+
+    return {
+        success: false, msg: "Failed to verify",
+    }
 }

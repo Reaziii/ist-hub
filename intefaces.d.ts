@@ -41,7 +41,8 @@ interface ProfileInterface {
     resume: string | null,
     _id: string,
     owner: boolean,
-    username: string
+    username: string,
+    verified: boolean
 }
 
 interface ExperieneInterfaces {
@@ -121,7 +122,13 @@ interface ShortUserInterface {
     photo: string,
     username: string,
     skills: SkillInterface[],
-    _id : string,
-    bio : string,
+    _id: string,
+    bio: string,
     resume: string,
+}
+
+interface UserVerifierInterface {
+    verfier: string,
+    owner: string,
+    verifiedAt: Date
 }

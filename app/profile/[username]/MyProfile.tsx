@@ -1,8 +1,8 @@
-import { extractEmailAddressAndId, user } from '@/lib/user'
+import { extractEmailAddressAndId, user, verifyUser } from '@/lib/user'
 import React from 'react'
 import { FaCheckCircle, FaPhoneAlt } from "react-icons/fa";
 import { MdOutlineAlternateEmail } from "react-icons/md";
-import About from './About';
+import About from './About/About';
 import Education from './Education/Education';
 import ProfilePicture from './ProfilePicture';
 import { getProfileDetails, updateAbout, updateNameAndBio, uploadProfilePicture, uploadResume } from '@/lib/profile';
@@ -16,6 +16,7 @@ import Experience from './Experience/Experience';
 import Skill from './skills/Skill';
 import Showcase from './showcase/Showcase';
 import { getProfileShowcases } from '@/lib/showcases'
+import VerifyUserModal from '@/components/VerifyUserModal';
 
 interface Props {
     username: string
@@ -49,7 +50,14 @@ const MyProfile: React.FC<Props> = async ({ username }) => {
                     </div>
                     <div className='px-[40px]  pt-[60px] relative'>
                         <div className='flex items-center gap-[20px]'>
-                            <h1 className='font-bold text-[24px]'>{profile.profile.fullname}</h1><FaCheckCircle size={20} color='lightgray' />
+                            <h1 className='font-bold text-[24px]'>{profile.profile.fullname}</h1>
+                            <VerifyUserModal
+                                verified={profile.profile.verified}
+                                verifyUser={verifyUser}
+                                iamverified={usr.usr?.verified ?? false}
+                                userid={profile.profile._id}
+
+                            />
                         </div>
                         <div className='flex'>
                             <p className='text-[16px] w-[60%] flex flex-col'>

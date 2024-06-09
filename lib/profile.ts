@@ -65,7 +65,8 @@ export const getProfileDetails = async (userid: string): Promise<ServerMessageIn
             resume: _user.resume,
             _id: String(_user._id),
             owner: usr.usr?._id === _user._id,
-            username: _user.username
+            username: _user.username,
+            verified: _user.verified
         };
         return { success: true, msg: "Profile fetched successfully", profile }
 
@@ -206,8 +207,8 @@ export const searchProfile = async (skills: string[]): Promise<ServerMessageInte
                 photo: 1,
                 username: 1,
                 skills: 1,
-                bio : 1,
-                shouldMatch : 1,
+                bio: 1,
+                shouldMatch: 1,
             }
         })
 
