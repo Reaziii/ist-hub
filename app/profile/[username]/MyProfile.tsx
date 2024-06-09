@@ -94,7 +94,9 @@ const MyProfile: React.FC<Props> = async ({ username }) => {
                     add={SkillAPI.addNewSkill}
                     getSkills={SkillAPI.getSkills}
                     deleteItem={SkillAPI.deleteASkill}
-                    userid={profile.profile._id} />
+                    userid={profile.profile._id}
+                    owner={owner}
+                    />
                 <Showcase
                     userid={profile.profile._id}
                     getProfileShowcase={getProfileShowcases}
