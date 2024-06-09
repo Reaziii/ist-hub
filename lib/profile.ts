@@ -9,6 +9,7 @@ import ExperienceModel from "@/models/ExperienceModel";
 import ShowcaseModel from "@/models/ShowcaseModel";
 import ShowcaseTagModel from "@/models/ShowcaseTagModel";
 import MongoConn from "./mongodb";
+import { PipelineStage } from "mongoose";
 
 export const uploadProfilePicture = async (form: FormData): Promise<ServerMessageInterface & { img?: string }> => {
     "use server"
@@ -64,7 +65,7 @@ export const getProfileDetails = async (userid: string): Promise<ServerMessageIn
             resume: _user.resume,
             _id: String(_user._id),
             owner: usr.usr?._id === _user._id,
-            username : _user.username
+            username: _user.username
         };
         return { success: true, msg: "Profile fetched successfully", profile }
 
@@ -146,132 +147,81 @@ export const uploadResume = async (form: FormData): Promise<ServerMessageInterfa
 }
 
 
+export const searchProfile = async (skills: string[]): Promise<ServerMessageInterface & { users: ShortUserInterface[] }> => {
+    "use server"
+    try {
+        skills = skills.map(item => item.toLowerCase())
+        await MongoConn();
+        let pipeline: PipelineStage[] = [];
 
+        pipeline.push({
+            $addFields: {
+                userid: {
+                    $toString: "$_id"
+                }
+            }
+        })
+        pipeline.push({
+            $lookup: {
+                from: "skills",
+                localField: "userid",
+                foreignField: "userid",
+                pipeline: [
+                    {
+                        $addFields: {
+                            "skillName": {
+                                "$toLower": "$skill"
+                            }
+                        }
+                    }
+                ],
+                as: "skills"
+            }
+        })
 
-// export const updateShowcaseVerifier = async (email: string, showcase_id: number) => {
-//     "use server"
-//     try {
-//         let sql = `select * from showcase_verifier_details where email = ? and showcase_id = ?`
-//         let data = await conn.query(sql, [email, showcase_id]) as any[];
-//         if (data[0].length === 0) {
-//             sql = `insert into showcase_verifier_details(email, showcase_id) values(?,?)`;
-//             await conn.query(sql, [email, showcase_id]);
-//         }
-//         return { success: true, msg: "shwocase verifier details updated" }
-//     } catch (err) {
-//         return { success: false, msg: "shwocase verifier details updated" }
-//     }
-// }
+        pipeline.push({
+            $addFields: {
+                skillItems: "$skills.skillName"
+            }
+        })
 
+        pipeline.push({
+            $addFields: {
+                shouldMatch: {
+                    $setIsSubset: [skills, "$skillItems"]
+                }
+            }
+        })
 
-// export const sendEmailToVerifier = async (showcase_id: number, email: string) => {
-//     "use server"
-//     try {
-//         let sql = `select * from showcase_verifier_details where email = ? and showcase_id = ?`
-//         let data = await conn.query(sql, [email, showcase_id]) as any[];
-//         if (data[0].length === 0) {
-//             return { success: false, msg: "Doesn't exists" }
-//         }
+        pipeline.push({
+            $match: {
+                shouldMatch: true
+            }
+        })
+        pipeline.push({
+            $project: {
+                fullname: 1,
+                resume: 1,
+                email: 1,
+                photo: 1,
+                username: 1,
+                skills: 1,
+                bio : 1,
+                shouldMatch : 1,
+            }
+        })
 
-//         let mail = new sendMail(email, "we have xxx", "hello world");
-//         await mail.send();
-//         sql = `update showcase_verifier_details set mailSent = ? where email = ? and showcase_id = ?`
-//         await conn.query(sql, [email, showcase_id])
+        let user = await UserModel.aggregate<ShortUserInterface>(pipeline);
+        console.log(user)
+        for (let i = 0; i < user.length; i++) {
+            user[i]._id = String(user[i]._id);
+            for (let j = 0; j < user[i].skills.length; j++) {
+                user[i].skills[j]._id = String(user[i].skills[j]._id)
+            }
+        }
+        return { success: true, msg: "Retrived users", users: user }
+    } catch (err) {
+        return { success: false, msg: "Failed to retrived", users: [] }
+    }
+}
 
-//         return { success: true, msg: "mail has been sent" }
-//     } catch (err) {
-//         return { success: false, msg: "Failed to sent" }
-
-//     }
-// }
-
-
-// export const updateShowcaseVerifierDetails = async (params: ShowcaseVerifierDetails): Promise<ServerMessageInterface> => {
-//     "use server"
-//     try {
-//         let sql = `select * from showcase_verifier_details where email = ? and showcase_id = ?`
-//         let data = await conn.query(sql, [params.email, params.showcase_id]) as any[];
-//         if (data[0].length === 0) {
-//             sql = `insert into showcase_verifier_details(email, showcase_id) values(?,?)`;
-//             await conn.query(sql, [params.email, params.showcase_id]);
-//         }
-
-//         sql = `update showcase_verifier_details set name = ?, title = ?, company = ?`;
-//         await conn.query(sql, [params.name, params.title, params.company]);
-//         return { success: true, msg: "shwocase verifier details updated" }
-
-
-//     } catch (err) {
-//         return { success: false, msg: "shwocase verifier details updated" }
-//     }
-// }
-
-// export const updateVerifierEmailsOfShowcase = async (emails: string[], showcase_id: number): Promise<ServerMessageInterface> => {
-//     "use server"
-//     try {
-//         const usr = await user();
-//         if (!usr.usr) {
-//             return { success: false, msg: "unauthorized" }
-//         }
-//         let sql = 'select * from showcase where showcase_id = ? and userid = ?';
-//         let data = await conn.query(sql, [showcase_id, usr.usr.userid]) as any[];
-//         if (data[0].length === 0) {
-//             return { success: false, msg: "unathorized" }
-//         }
-//         sql = `delete from showcase_verifier where email = ? and showcase_id = ?`;
-//         await Promise.all(emails.map((item) => conn.query(sql, [item, showcase_id])))
-//         sql = 'insert into showcase_verifier(email, showcase_id) values(?,?);'
-//         await Promise.all(emails.map((item) => conn.query(sql, [item, showcase_id])));
-//         for (let i = 0; i < emails.length; i++) {
-//             await updateShowcaseVerifier(emails[i], showcase_id)
-//             await sendEmailToVerifier(showcase_id, emails[i]);
-//         }
-//     } catch (err) {
-//         console.log(err);
-//     }
-
-
-
-//     return { success: false, msg: "Failed to update emails" }
-// }
-
-
-// export const addNewVerifierEmail = async (email: string, showcase_id: number): Promise<ServerMessageInterface> => {
-//     "use server"
-//     try {
-//         let usr = await user();
-//         if (!usr.usr) return { success: false, msg: "unauthorized" }
-//         let sql = 'select * from showcase where userid = ? and showcase_id = ?';
-//         let data = await conn.query(sql, [usr.usr.userid, showcase_id]) as any[];
-//         if (data[0].length === 0) return { success: false, msg: "Unauthorized" };
-//         sql = `select * from showcase_verfier_details where email = ? and showcase_id = ?`;
-//         data = await conn.query(sql, [email, showcase_id]) as any[];
-//         if (data[0].length > 0) return { success: false, msg: "Email already exists" };
-//         sql = 'insert into showcase_verfier_details(email, showcase_id, verified, name, title, company, mailSent) values (?,?,?,?,?,?,?)';
-//         await conn.query(sql, [email, showcase_id, false, "", "", "", false]);
-//         return { success: true, msg: "Verifier added succesfully" }
-//     } catch (err) {
-//         console.log(err);
-//         return { success: false, msg: "Failed to add verifier" }
-//     }
-
-
-// }
-
-// export const removeVerifierEmail = async (email: string, showcase_id: number): Promise<ServerMessageInterface> => {
-//     "use server"
-//     try {
-//         let usr = await user();
-//         if (!usr.usr) return { success: false, msg: "unauthorized" }
-//         let sql = 'select * from showcase where userid = ? and showcase_id = ?';
-//         let data = await conn.query(sql, [usr.usr.userid, showcase_id]) as any[];
-//         if (data[0].length === 0) return { success: false, msg: "Unauthorized" };
-
-//         sql = 'delete from showcase_verfier_details where email = ? and showcase_id = ?';
-//         await conn.query(sql, [email, showcase_id]);
-//         return { success: true, msg: "Verifier deleted succesfully" }
-//     } catch (err) {
-//         console.log(err);
-//         return { success: false, msg: "Failed to delete" }
-//     }
-// }

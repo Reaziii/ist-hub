@@ -28,7 +28,7 @@ interface EducationInterface {
     end_date: Date,
     _id: string,
     still: boolean,
-    userid : string
+    userid: string
 }
 
 interface ProfileInterface {
@@ -39,9 +39,9 @@ interface ProfileInterface {
     email: string,
     fullname: string,
     resume: string | null,
-    _id : string,
-    owner : boolean,
-    username : string
+    _id: string,
+    owner: boolean,
+    username: string
 }
 
 interface ExperieneInterfaces {
@@ -74,9 +74,9 @@ interface ShowcaseVerifierDetails {
 }
 
 interface ShowcaseTagInterface {
-    showcase_id : string,
-    tag : string,
-    _id : string
+    showcase_id: string,
+    tag: string,
+    _id: string
 }
 
 
@@ -88,13 +88,13 @@ interface ShowcaseInterface {
     tags: ShowcaseTagInterface[]
 }
 
-interface JobTagInterface{
-    tag:string,
-    _id : string,
+interface JobTagInterface {
+    tag: string,
+    _id: string,
     job_id: string
 }
 
-interface JobInterface{
+interface JobInterface {
     _id: string,
     title: string,
     tags: JobTagInterface[],
@@ -102,15 +102,26 @@ interface JobInterface{
     company_email: string,
     website: string,
     address: string,
-    description : string,
-    type : string,
+    description: string,
+    type: string,
     userid: string,
-    isActive : boolean,
-    createdAt : Date,
-    updatedAt : Date
+    isActive: boolean,
+    createdAt: Date,
+    updatedAt: Date
 }
 
 interface JobInterfaceWithUserData extends JobInterface {
     username: string,
     fullname: string
+}
+
+interface ShortUserInterface {
+    fullname: string,
+    email: string,
+    photo: string,
+    username: string,
+    skills: SkillInterface[],
+    _id : string,
+    bio : string,
+    resume: string,
 }
