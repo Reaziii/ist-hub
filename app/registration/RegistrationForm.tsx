@@ -46,14 +46,14 @@ const registrationSchema = yup.object().shape({
 
 const RegistrationForm: React.FC<Props> = ({ handleRegistration }) => {
     let initialValues: RegistrationInterface = {
-        name: "Reaz Ahammed",
-        email: "baphonreaz@gmail.com",
-        dept: "ECE",
-        batch: 26,
-        roll: 19057,
-        phone: "01533523233",
-        password: "reazreaz",
-        confirmPassword: "reazreaz"
+        name: "",
+        email: "",
+        dept: "",
+        batch: 1,
+        roll: 1,
+        phone: "",
+        password: "",
+        confirmPassword: ""
     }
     const router = useRouter();
     return (
