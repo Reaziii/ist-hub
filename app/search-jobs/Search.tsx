@@ -6,29 +6,33 @@ import React from 'react'
 import * as yup from 'yup'
 import Select from '@/components/SelectInput'
 import ButtonSpinner from '@/components/ButtonSpinner'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
-interface Props {
-    searchJobs: (tags: string[], type: string) => Promise<ServerMessageInterface & { jobs: JobInterfaceWithUserData[] }>
-}
 
-const Search: React.FC<Props> = ({ searchJobs }) => {
+const Search: React.FC= () => {
+    const router = useRouter();
+    const path = usePathname();
+    const params = useSearchParams();
+    const _tags: string | null = params.get("tags")
+    const _type: string | null = params.get("type")
     let inititalValues: {
         type: string,
         tags: JobTagInterface[],
         tempTag: ""
     } = {
-        type: EmployeeType.FULL_TIME,
-        tags: [],
+        type: _type ?? EmployeeType.FULL_TIME,
+        tags: _tags?.split(',').map(item => ({ tag: item, _id: "", job_id: "" })) ?? [],
         tempTag: "",
     }
+
     return (
-        <div className='border border-[#ccc] mt-[20px] rounded-lg p-[40px] pt-[0px] overflow-hidden bg-white relative mb-[100px]'>
+        <div className='border border-[#ccc] mt-[20px] rounded-lg p-[40px] pt-[0px] overflow-hidden bg-white relative mb-[10px]'>
             <Formik
                 initialValues={inititalValues}
                 onSubmit={(values, { setSubmitting }) => {
-                    searchJobs([], EmployeeType.FREELANCE).then(resp => {
-                        console.log(resp.jobs)
-                    })
+                    let x = values.tags.map(item => item.tag).join(",");
+                    setSubmitting(false);
+                    router.push(path + "/?tags=" + x + "&type=" + values.type)
                 }}
             >
 

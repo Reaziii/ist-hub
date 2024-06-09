@@ -187,57 +187,110 @@ export const getPaginatedJobs = async (page: number = 1, limit: number = 10): Pr
 };
 
 
-export const searchJobs = async (tags: string[], type: string): Promise<ServerMessageInterface & { jobs: any[] }> => {
+export const searchJobs = async (tags: string[], type: string): Promise<ServerMessageInterface & { jobs: JobInterfaceWithUserData[] }> => {
     "use server"
     try {
-        // console.log("[searching...]")
-        // await MongoConn();
-        // let pipeline: PipelineStage[] = []
-        // pipeline.push({
-        //     $match: {
-        //         isActive: true,
-        //         type: type
-        //     }
-        // })
-        // pipeline.push({
-        //     $addFields: {
-        //         "id": { $toString: "$_id" }
-        //     }
-        // })
-        // pipeline.push(
-        //     {
-        //         $lookup: {
-        //             from: 'jobtags',
-        //             localField : "id",
-        //             foreignField : "job_id",
-        //             as: 'tags',
+        await MongoConn();
+        let pipeline: PipelineStage[] = []
+        pipeline.push({
+            $match: {
+                isActive: true,
+                type: type
+            }
+        })
+        pipeline.push({
+            $addFields: {
+                "id": { $toString: "$_id" }
+            }
+        })
+        pipeline.push(
+            {
+                $lookup: {
+                    from: 'jobtags',
+                    "localField": "id",
+                    "foreignField": "job_id",
+                    pipeline: [
+                        {
+                            $addFields: {
+                                "name": {
+                                    "$toLower": "$tag"
+                                }
+                            }
+                        }
+                    ],
+                    as: 'tags',
 
-        //             pipeline : [
-        //                 {
-        //                     $unwind : "$tags"
-        //                 },
-        //                 {
-        //                     $group : {
-        //                         $tags: { $push : "$tag"}
-        //                     }
-        //                 }
-        //             ]
-        //         }
-        //     },
-        //     {
-        //         $project: {
-        //             title: 1,
-        //             description: 1,
-        //             tags: 1 // Extract the 'tags' array from the object
-        //         }
-        //     }
-        // )
+                },
+            },
+            {
+                "$addFields": {
+                    "tagItems": "$tags.name",
+                    "_userid": {
+                        $toObjectId: "$userid"
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    shouldMatch: {
+                        $setIsSubset: [tags, "$tagItems"]
+                    }
+                }
+            },
+            {
+                $match: {
+                    shouldMatch: true
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_userid",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            },
+            {
+                $unwind: "$user"
+            },
+            {
+                $addFields: {
+                    username: "$user.username",
+                    fullname: "$user.fullname",
+                }
+            },
+            {
+                $project: {
+                    title: 1,
+                    description: 1,
+                    tagItems: 1,
+                    shouldMatch: 1,
+                    username: 1,
+                    fullname: 1,
+                    userid: 1,
+                    company: 1,
+                    company_email: 1,
+                    website: 1,
+                    type: 1,
+                    tags: 1,
+                    address: 1,
+                    isActive: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                }
+            }
+        )
 
-        // let jobs = await JobModel.aggregate<any[]>(pipeline);
-        // jobs = jobs.map(item=>({...item,_id : String(item._id)}))
-        // return {success : true, msg : "asdfasdf", jobs}
+        let jobs = await JobModel.aggregate<JobInterfaceWithUserData>(pipeline);
+        for (let i = 0; i < jobs.length; i++) {
+            jobs[i]._id = String(jobs[i]._id);
+            for (let j = 0; j < jobs[i].tags.length; j++) {
+                jobs[i].tags[j]._id = String(jobs[i].tags[j]._id)
+            }
+        }
+        return { success: true, msg: "asdfasdf", jobs }
     } catch (err) {
-        console.log(err);
+        console.log("job searching error ===>\n", err);
         console.log("search failed")
 
     }

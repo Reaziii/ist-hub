@@ -41,8 +41,15 @@ const Job: React.FC<Props> = ({ getJobDetails, job_id, userid }) => {
             <br />
             <a target='_blank' className="text-blue-400" href={`mailto:${job.company_email}`}>{job.company_email}</a>
             <div className='mt-[40px]' />
-            <ShowTextAreaText text={job.description}/>
-
+            <ShowTextAreaText text={job.description} />
+            <div className='flex flex-wrap mt-10 gap-2'>
+                {
+                    job.tags.map((item, key) => (<p key={key}
+                        className='border w-auto px-3 h-[30px] flex items-center rounded-full bg-gray-200 border-gray-300'
+                    >{item.tag}
+                    </p>))
+                }
+            </div>
             {
                 userid === job.userid && <Link href={`/job/update/${job_id}`}>
                     <button className='absolute right-5 top-5 hover:bg-gray-100 h-10 w-10 border rounded-full transition-all'>
