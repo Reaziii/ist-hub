@@ -16,12 +16,12 @@ const Details: React.FC<Props> = ({ details, userDetails, owner }) => {
             <h1 className='font-bold text-[20px]'>{details.name}</h1>
             {
                 owner && <button className='absolute right-10 top-5 hover:bg-gray-100 h-10 w-10 border rounded-full transition-all'>
-                    <Link href={"/showcase/update/step-1?showcase_id=" + details._id} >
+                    <a href={"/showcase/update/step-1?showcase_id=" + details._id} >
                         <i className="fa-regular fa-pen-to-square"></i>
-                    </Link>
+                    </a>
                 </button>
             }
-            <Link href={"/profile/" + userDetails.username}>{userDetails.fullname}</Link>
+            <a href={"/profile/" + userDetails.username}>{userDetails.fullname}</a>
             <div className='flex flex-wrap gap-2 mt-[20px]'>
                 {
                     details.tags.map((item, key) => (

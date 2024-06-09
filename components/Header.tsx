@@ -16,8 +16,8 @@ const Header = async () => {
                         {
                             usr.usr ? <HeaderProfileDropdown user={usr.usr} /> :
                                 <>
-                                    <Link href="/registration" className="text-gray-800  hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 :bg-gray-700 focus:outline-none :ring-gray-800">Registration</Link>
-                                    <Link href="/login" className="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2  :bg-primary-700 focus:outline-none :ring-primary-800">Sign in</Link>
+                                    <a href="/registration" className="text-gray-800  hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 :bg-gray-700 focus:outline-none :ring-gray-800">Registration</a>
+                                    <a href="/login" className="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2  :bg-primary-700 focus:outline-none :ring-primary-800">Sign in</a>
                                 </>
                         }
 
@@ -30,13 +30,13 @@ const Header = async () => {
                     <div className="hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-1" id="mobile-menu-2">
                         <ul className="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
                             <li>
-                                <Link href="/" className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 " aria-current="page">Home</Link>
+                                <a href="/" className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 " aria-current="page">Home</a>
                             </li>
                             <li>
-                                <Link href="/search-jobs" className="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0  lg::text-white :bg-gray-700 :text-white lg::bg-transparent ">Search Jobs</Link>
+                                <a href="/search-jobs" className="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0  lg::text-white :bg-gray-700 :text-white lg::bg-transparent ">Search Jobs</a>
                             </li>
                             <li>
-                                <Link href="/search-profile" className="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0  lg::text-white :bg-gray-700 :text-white lg::bg-transparent ">Search Profile</Link>
+                                <a href="/search-profile" className="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0  lg::text-white :bg-gray-700 :text-white lg::bg-transparent ">Search Profile</a>
                             </li>
                             <li>
                                 <a target="_blank" href="https://ist.edu.bd" className="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0  lg::text-white :bg-gray-700 :text-white lg::bg-transparent ">IST</a>

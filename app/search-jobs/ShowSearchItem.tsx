@@ -33,11 +33,11 @@ const JobSearchItem: React.FC<Props> = ({ searchJobs }) => {
                 <div key={key} className='border border-[#ccc] mt-[20px] rounded-lg p-[40px] overflow-hidden bg-white relative'>
                     <a href={`/profile/${item.username}`} target='_blank'>{item.fullname}</a>
                     <div className='pt-2' />
-                    <Link href={"/job/" + item._id}>
+                    <a href={"/job/" + item._id}>
                         <h1 className='font-bold'>
                             {item.title} | {item.type}
                         </h1>
-                    </Link>
+                    </a>
                     <p>
                         {truncateString(item.description, 200)}
                     </p>

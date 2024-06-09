@@ -25,16 +25,16 @@ const HeaderProfileDropdown: React.FC<Props> = ({ user }) => {
             <div className={`z-10 ${!open ? "hidden" : ""} bg-white divide-y divide-gray-100 rounded-lg shadow w-44 absolute`}>
                 <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                     <li>
-                        <Link href={`/profile/${user.username}`} className="block px-4 py-2 hover:bg-gray-100  ">Profile</Link>
+                        <a href={`/profile/${user.username}`} className="block px-4 py-2 hover:bg-gray-100  ">Profile</a>
                     </li>
                     <li>
-                        <Link href="/job/create" className="block px-4 py-2 hover:bg-gray-100  ">Post a job</Link>
+                        <a href="/job/create" className="block px-4 py-2 hover:bg-gray-100  ">Post a job</a>
                     </li>
                     <li>
-                        <Link href={`/profile/${user.username}/jobs`} className="block px-4 py-2 hover:bg-gray-100  ">My Jobs</Link>
+                        <a href={`/profile/${user.username}/jobs`} className="block px-4 py-2 hover:bg-gray-100  ">My Jobs</a>
                     </li>
                     <li>
-                        <Link href="/logout" className="block px-4 py-2 hover:bg-gray-100  ">Sign out</Link>
+                        <a href="/logout" className="block px-4 py-2 hover:bg-gray-100  ">Sign out</a>
                     </li>
                 </ul>
             </div>

@@ -51,11 +51,11 @@ const Job: React.FC<Props> = ({ getJobDetails, job_id, userid }) => {
                 }
             </div>
             {
-                userid === job.userid && <Link href={`/job/update/${job_id}`}>
+                userid === job.userid && <a href={`/job/update/${job_id}`}>
                     <button className='absolute right-5 top-5 hover:bg-gray-100 h-10 w-10 border rounded-full transition-all'>
                         <i className="fa-regular fa-pen-to-square"></i>
                     </button>
-                </Link>
+                </a>
             }
         </div >
     )
