@@ -1,5 +1,4 @@
 import { v2 as cloudinary } from 'cloudinary';
-import multer from 'multer'
 import streamifier from 'streamifier'
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,

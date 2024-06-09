@@ -2,7 +2,7 @@ import JobModel from "@/models/JobModel";
 import MongoConn from "./mongodb"
 import JobTagModel from "@/models/JobTagModel";
 import { user } from "./user";
-import { EmployeeType, ErrorMessage } from "@/constants";
+import { ErrorMessage } from "@/constants";
 import UserModel from "@/models/UserModel";
 import { PipelineStage } from "mongoose";
 

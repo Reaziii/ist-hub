@@ -1,4 +1,3 @@
-import conn from "./mysql";
 import bcrypt from 'bcrypt'
 import otpgenerator from 'otp-generator'
 import sendmail from './sendmail'

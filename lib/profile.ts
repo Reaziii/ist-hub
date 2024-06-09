@@ -4,10 +4,6 @@ import { user } from "./user";
 import { signNewToken } from "./auth";
 import { ErrorMessage } from "@/constants";
 import UserModel from "@/models/UserModel";
-import EducationModel from "@/models/EducationModel";
-import ExperienceModel from "@/models/ExperienceModel";
-import ShowcaseModel from "@/models/ShowcaseModel";
-import ShowcaseTagModel from "@/models/ShowcaseTagModel";
 import MongoConn from "./mongodb";
 import { PipelineStage } from "mongoose";
 
