@@ -7,11 +7,12 @@ import { useRouter } from 'next/navigation';
 
 interface ShowcaseProps {
     getProfileShowcase: (userid: string) => Promise<ServerMessageInterface & { showcases: ShowcaseInterface[] }>,
-    userid: string
+    userid: string,
+    owner: boolean
 }
 
 
-const Showcase: FC<ShowcaseProps> = ({ getProfileShowcase, userid }) => {
+const Showcase: FC<ShowcaseProps> = ({ getProfileShowcase, userid, owner }) => {
     const [loading, setLoading] = useState(false);
     let [showcases, setShowcases] = useState<ShowcaseInterface[]>([])
     const router = useRouter();
@@ -57,7 +58,9 @@ const Showcase: FC<ShowcaseProps> = ({ getProfileShowcase, userid }) => {
                             </div>
                     }
                 </div>
-                <AddShowcase />
+                {
+                    owner && <AddShowcase />
+                }
             </div>
         </div>
     )

@@ -97,7 +97,9 @@ const MyProfile: React.FC<Props> = async ({ username }) => {
                     userid={profile.profile._id} />
                 <Showcase
                     userid={profile.profile._id}
-                    getProfileShowcase={getProfileShowcases} />
+                    getProfileShowcase={getProfileShowcases}
+                    owner={owner}
+                />
             </div>
         </div>
     )
