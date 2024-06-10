@@ -7,5 +7,5 @@ export enum EmployeeType {
 }
 
 export const ErrorMessage = {
-    UNAUTHORIZED: { success: false, msg: "" }
+    UNAUTHORIZED: { success: false, msg: "Please sign in to get this feature" }
 }
