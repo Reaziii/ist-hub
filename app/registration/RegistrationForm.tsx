@@ -46,7 +46,7 @@ const RegistrationForm: React.FC<Props> = ({ handleRegistration }) => {
     let initialValues: RegistrationInterface = {
         name: "",
         email: "",
-        dept: "",
+        dept: "CSE",
         batch: 1,
         roll: 1,
         phone: "",
@@ -58,6 +58,7 @@ const RegistrationForm: React.FC<Props> = ({ handleRegistration }) => {
         <Formik
             initialValues={initialValues}
             onSubmit={(values: RegistrationInterface, { setSubmitting, setErrors, setTouched }) => {
+                
                 handleRegistration(values.name, values.email, values.dept, values.batch, values.roll, values.phone, values.password, values.confirmPassword).then(res => {
                     handleToast(res);
                     setSubmitting(false);
@@ -66,6 +67,8 @@ const RegistrationForm: React.FC<Props> = ({ handleRegistration }) => {
                         router.push(`/verify/?email=${encodeURIComponent(values.email)}`)
                     }
                 })
+
+
             }}
             validationSchema={registrationSchema}
             enableReinitialize
