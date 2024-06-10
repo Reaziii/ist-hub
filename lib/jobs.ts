@@ -5,6 +5,7 @@ import { user } from "./user";
 import { ErrorMessage } from "@/constants";
 import UserModel from "@/models/UserModel";
 import { PipelineStage } from "mongoose";
+import JobWhitelistModel from "@/models/JobWhitelistModel";
 
 
 export const createNewJob = async (params: JobInterface): Promise<ServerMessageInterface & { job_id?: string }> => {
@@ -25,7 +26,8 @@ export const createNewJob = async (params: JobInterface): Promise<ServerMessageI
             description: params.description,
             type: params.type,
             userid: usr.usr._id,
-            isActive: params.isActive
+            isActive: params.isActive,
+            expiredAt: params.expiredAt
         })
         await job.save();
         for (let i = 0; i < params.tags.length; i++) {
@@ -56,7 +58,6 @@ export const updateJob = async (params: JobInterface): Promise<ServerMessageInte
         if (!job || job.userid !== usr.usr._id) {
             return ErrorMessage.UNAUTHORIZED
         }
-        console.log(params)
         job.title = params.title;
         job.company = params.company;
         job.company_email = params.company_email;
@@ -66,6 +67,7 @@ export const updateJob = async (params: JobInterface): Promise<ServerMessageInte
         job.type = params.type;
         job.userid = usr.usr._id;
         job.isActive = params.isActive
+        job.expiredAt = params.expiredAt
         await job.save();
         await JobTagModel.deleteMany({ job_id: job._id })
         for (let i = 0; i < params.tags.length; i++) {
@@ -85,10 +87,11 @@ export const updateJob = async (params: JobInterface): Promise<ServerMessageInte
 
 
 
-export const getJobDetails = async (job_id: string): Promise<ServerMessageInterface & { job?: JobInterface }> => {
+export const getJobDetails = async (job_id: string): Promise<ServerMessageInterface & { job?: JobInterface, whitelisted?: boolean }> => {
     "use server"
     try {
         await MongoConn();
+        let usr = await user();
         let job = await JobModel.findById(job_id).lean();
         if (!job) {
             return { success: false, msg: "Job not found" }
@@ -96,7 +99,11 @@ export const getJobDetails = async (job_id: string): Promise<ServerMessageInterf
         job.tags = await JobTagModel.find({ job_id: job_id }).lean();
         job.tags = job.tags.map((item) => ({ ...item, _id: String(item._id) }));
         job._id = String(job._id)
-        return { success: true, msg: "Job fetched successfully", job }
+        let isWhitelisted = false;
+        if (usr.usr) {
+            isWhitelisted = (await JobWhitelistModel.findOne({ userid: usr.usr._id, job_id })) ? true : false
+        }
+        return { success: true, msg: "Job fetched successfully", job, whitelisted: isWhitelisted }
     } catch (err) {
         console.log("feting job failed ===> \n", err)
         return { success: false, msg: "Failed to fetch job detailis" }
@@ -144,16 +151,40 @@ export const deleteJob = async (job_id: string): Promise<ServerMessageInterface>
     }
 }
 
-
+export const toggleJobWhitelist = async (job_id: string): Promise<ServerMessageInterface> => {
+    "use server";
+    try {
+        let usr = await user();
+        if (!usr.usr) return ErrorMessage.UNAUTHORIZED;
+        let whitelist = await JobWhitelistModel.findOne({ userid: usr.usr._id, job_id });
+        if (whitelist) {
+            await whitelist.deleteOne();
+            return { success: true, msg: "Removed job from whitelist" }
+        }
+        let newWhitelist = new JobWhitelistModel({
+            job_id,
+            userid: usr.usr._id
+        });
+        await newWhitelist.save();
+        return { success: true, msg: "Job added to whitelist" }
+    } catch (err) {
+        console.log("job adding whitelist error ===> \n", err)
+        return { success: false, msg: "Failed to add to whitelist" }
+    }
+}
 
 
 export const getPaginatedJobs = async (page: number = 1, limit: number = 10): Promise<ServerMessageInterface & { jobs: JobInterfaceWithUserData[] }> => {
     "use server"
     try {
         await MongoConn()
+        let usr = await user();
         const skip = (page - 1) * limit;
         const jobs = await JobModel.find({
-            isActive: true
+            isActive: true,
+            expiredAt: {
+                $gte: new Date()
+            }
         })
             .sort({ createdAt: 1 })
             .skip(skip)
@@ -173,12 +204,62 @@ export const getPaginatedJobs = async (page: number = 1, limit: number = 10): Pr
             ret[i] = {
                 ...jobs[i],
                 username: user.username,
-                fullname: user.fullname
+                fullname: user.fullname,
+                whitelisted: false
+            }
+            if (usr.usr) {
+                ret[i].whitelisted = (await JobWhitelistModel.findOne({ job_id: jobs[i]._id, userid: usr.usr._id })) ? true : false;
+
             }
         }
+        return { success: true, msg: "retrived jobs", jobs: ret };
+    } catch (error) {
+        console.error('Error fetching paginated jobs:', error);
+        return { success: false, msg: "Failed to retrive", jobs: [] }
+    }
+};
 
+export const getWhitelistedJobs = async (page: number = 1, limit: number = 10000): Promise<ServerMessageInterface & { jobs: JobInterfaceWithUserData[] }> => {
+    "use server"
+    try {
+        await MongoConn()
+        let usr = await user();
+        if (!usr.usr) return { ...ErrorMessage.UNAUTHORIZED, jobs: [] }
+        const skip = (page - 1) * limit;
+        let whitelisted = (await JobWhitelistModel.find({ userid: usr.usr._id })).map(item => item.job_id)
+        const jobs = await JobModel.find({
+            isActive: true,
+            _id: { $in: whitelisted },
+            expiredAt: {
+                $gte: new Date()
+            }
+        })
+            .sort({ createdAt: 1 })
+            .skip(skip)
+            .limit(limit)
+            .lean();
 
+        for (let i = 0; i < jobs.length; i++) {
+            jobs[i].tags = await JobTagModel.find({ job_id: jobs[i]._id }).lean();
+            jobs[i].tags = jobs[i].tags.map((item) => ({ ...item, _id: String(item._id) }));
+            jobs[i]._id = String(jobs[i]._id)
+        }
 
+        let ret: JobInterfaceWithUserData[] = [];
+        for (let i = 0; i < jobs.length; i++) {
+            let user = await UserModel.findById(jobs[i].userid);
+            if (!user) throw "";
+            ret[i] = {
+                ...jobs[i],
+                username: user.username,
+                fullname: user.fullname,
+                whitelisted: false
+            }
+            if (usr.usr) {
+                ret[i].whitelisted = (await JobWhitelistModel.findOne({ job_id: jobs[i]._id, userid: usr.usr._id })) ? true : false;
+
+            }
+        }
         return { success: true, msg: "retrived jobs", jobs: ret };
     } catch (error) {
         console.error('Error fetching paginated jobs:', error);
@@ -191,6 +272,7 @@ export const searchJobs = async (tags: string[], type: string): Promise<ServerMe
     "use server"
     try {
         await MongoConn();
+        let usr = await user();
         let pipeline: PipelineStage[] = []
         pipeline.push({
             $match: {
@@ -287,13 +369,18 @@ export const searchJobs = async (tags: string[], type: string): Promise<ServerMe
             for (let j = 0; j < jobs[i].tags.length; j++) {
                 jobs[i].tags[j]._id = String(jobs[i].tags[j]._id)
             }
+            jobs[i].whitelisted = false;
+            if (usr.usr) {
+                jobs[i].whitelisted = (await JobWhitelistModel.findOne({ job_id: jobs[i]._id, userid: usr.usr._id })) ? true : false;
+            }
         }
         return { success: true, msg: "asdfasdf", jobs }
     } catch (err) {
         console.log("job searching error ===>\n", err);
-        console.log("search failed")
 
     }
 
     return { success: false, msg: "Failed to retrive", jobs: [] }
 }
+
+

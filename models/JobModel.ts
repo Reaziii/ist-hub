@@ -15,7 +15,11 @@ const Schema = new mongoose.Schema<JobInterface & mongoose.Document>({
         default: true
     },
     createdAt: Date,
-    updatedAt : Date
+    updatedAt: Date,
+    expiredAt: {
+        type: Date,
+        default: new Date()
+    }
 },
     {
         timestamps: true

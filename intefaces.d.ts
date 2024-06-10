@@ -108,12 +108,14 @@ interface JobInterface {
     userid: string,
     isActive: boolean,
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
+    expiredAt: Date
 }
 
 interface JobInterfaceWithUserData extends JobInterface {
     username: string,
-    fullname: string
+    fullname: string,
+    whitelisted: boolean
 }
 
 interface ShortUserInterface {
@@ -131,4 +133,9 @@ interface UserVerifierInterface {
     verfier: string,
     owner: string,
     verifiedAt: Date
+}
+
+interface JobWhiteListInterface {
+    userid: string,
+    job_id: string,
 }

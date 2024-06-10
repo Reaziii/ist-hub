@@ -1,14 +1,13 @@
 "use client"
+import WhitelistJobButton from '@/components/WhitelistJobButton';
 import { truncateString } from '@/utilities/string';
-import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
-import WhitelistJobButton from './WhitelistJobButton';
 
 interface Props {
     getPaginatedJobs: (page: number, limit: number) => Promise<ServerMessageInterface & { jobs: JobInterfaceWithUserData[] }>,
     toggleWhiteList: (job_id: string) => Promise<ServerMessageInterface>
 }
-const PaginatedJobs: React.FC<Props> = ({ getPaginatedJobs, toggleWhiteList }) => {
+const WhiteListedJobs: React.FC<Props> = ({ getPaginatedJobs, toggleWhiteList }) => {
     const [page, setPage] = useState(1);
     const [jobs, setJobs] = useState<JobInterfaceWithUserData[]>([]);
     const [hasMore, setHasmore] = useState(true);
@@ -27,13 +26,26 @@ const PaginatedJobs: React.FC<Props> = ({ getPaginatedJobs, toggleWhiteList }) =
             if (resp.jobs.length === 0) setHasmore(false);
         })
     }, [])
+
+    const handleToogleWhitelist = async (job_id: string): Promise<ServerMessageInterface> => {
+        return new Promise((resolve, error) => {
+            toggleWhiteList(job_id).then(resp => {
+                if (resp.success) {
+                    let _jobs = jobs.filter(item => item._id !== job_id)
+                    setJobs([..._jobs])
+                }
+                resolve(resp);
+
+            })
+        })
+    }
     return (
         <div className='flex flex-col items-center w-full'>
             <div>
                 {
                     jobs.map((item, key) => (
                         <div key={key} className='border border-[#ccc] mt-[20px] rounded-lg p-[40px] overflow-hidden bg-white relative'>
-                            <WhitelistJobButton whitelisted={item.whitelisted} toggleWhitelist={toggleWhiteList} job_id={item._id} />
+                            <WhitelistJobButton whitelisted={item.whitelisted} toggleWhitelist={handleToogleWhitelist} job_id={item._id} />
                             <a href={`/profile/${item.username}`} target='_blank'>{item.fullname}</a>
                             <div className='pt-2' />
                             <a href={"/job/" + item._id}>
@@ -71,4 +83,4 @@ const PaginatedJobs: React.FC<Props> = ({ getPaginatedJobs, toggleWhiteList }) =
     )
 }
 
-export default PaginatedJobs
+export default WhiteListedJobs

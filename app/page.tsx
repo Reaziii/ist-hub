@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import PaginatedJobs from "@/components/PaginatedJobs";
-import { getPaginatedJobs } from "@/lib/jobs";
+import { getPaginatedJobs, toggleJobWhitelist } from "@/lib/jobs";
 
 export default function Home() {
 
@@ -9,7 +9,9 @@ export default function Home() {
       <Header />
       <div className="pt-[60px]" />
       <div className="max-w-screen-xl mx-auto">
-        <PaginatedJobs getPaginatedJobs={getPaginatedJobs} />
+        <PaginatedJobs
+          toggleWhiteList={toggleJobWhitelist}
+          getPaginatedJobs={getPaginatedJobs} />
       </div>
     </main>
   );

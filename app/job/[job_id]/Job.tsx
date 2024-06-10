@@ -1,20 +1,23 @@
 "use client"
 import ButtonSpinner from '@/components/ButtonSpinner';
 import ShowTextAreaText from '@/components/ShowTextAreaText';
+import WhitelistJobButton from '@/components/WhitelistJobButton';
+import { formatDate } from '@/lib/utils';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 interface Props {
-    getJobDetails: (job_id: string) => Promise<ServerMessageInterface & { job?: JobInterface }>,
+    getJobDetails: (job_id: string) => Promise<ServerMessageInterface & { job?: JobInterface, whitelisted?: boolean }>,
     job_id: string,
-    userid: string | undefined | null
+    userid: string | undefined | null,
+    toggleWhitelist: (job_id: string) => Promise<ServerMessageInterface>
 }
-const Job: React.FC<Props> = ({ getJobDetails, job_id, userid }) => {
+const Job: React.FC<Props> = ({ getJobDetails, job_id, userid, toggleWhitelist }) => {
     const [loading, setLoading] = useState(true);
-    const [job, setJob] = useState<JobInterface | null>(null);
+    const [job, setJob] = useState<JobInterface & { whitelisted: boolean } | null>(null);
     useEffect(() => {
         getJobDetails(job_id).then(resp => {
             if (resp.job) {
-                setJob(resp.job)
+                setJob({ ...resp.job, whitelisted: resp.whitelisted ? true : false })
             }
             setLoading(false);
 
@@ -42,7 +45,8 @@ const Job: React.FC<Props> = ({ getJobDetails, job_id, userid }) => {
             <a target='_blank' className="text-blue-400" href={`mailto:${job.company_email}`}>{job.company_email}</a>
             <div className='mt-[40px]' />
             <ShowTextAreaText text={job.description} />
-            <div className='flex flex-wrap mt-10 gap-2'>
+            <h1 className="mt-[40px]"><span className="font-bold">Last date of application:</span> {formatDate(job.expiredAt ?? new Date())}</h1>
+            <div className='flex flex-wrap mt-5 gap-2'>
                 {
                     job.tags.map((item, key) => (<p key={key}
                         className='border w-auto px-3 h-[30px] flex items-center rounded-full bg-gray-200 border-gray-300'
@@ -50,12 +54,14 @@ const Job: React.FC<Props> = ({ getJobDetails, job_id, userid }) => {
                     </p>))
                 }
             </div>
+
             {
-                userid === job.userid && <a href={`/job/update/${job_id}`}>
+                userid === job.userid ? <a href={`/job/update/${job_id}`}>
                     <button className='absolute right-5 top-5 hover:bg-gray-100 h-10 w-10 border rounded-full transition-all'>
                         <i className="fa-regular fa-pen-to-square"></i>
                     </button>
                 </a>
+                    : <WhitelistJobButton toggleWhitelist={toggleWhitelist} job_id={job_id} whitelisted={job.whitelisted} />
             }
         </div >
     )

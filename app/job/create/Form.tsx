@@ -9,6 +9,7 @@ import ButtonSpinner from "@/components/ButtonSpinner"
 import React from 'react'
 import handleToast from "@/components/handleToast"
 import Toaster from "@/app/Toaster"
+import { formatDate } from "@/lib/utils"
 
 const validateSchema = yup.object().shape({
     title: yup.string().required("title is required").min(6),
@@ -26,7 +27,7 @@ interface Props {
 }
 
 const CreateJobForm: React.FC<Props> = ({ create }) => {
-    let inititalValues: JobInterface & { tempTag: string, _isActive: "YES" | "NO" } = {
+    let inititalValues: JobInterface & { tempTag: string, _isActive: "YES" | "NO", _expiredAt: string } = {
         title: "",
         description: "",
         userid: "",
@@ -41,7 +42,9 @@ const CreateJobForm: React.FC<Props> = ({ create }) => {
         isActive: true,
         _isActive: "YES",
         createdAt: new Date(),
-        updatedAt : new Date()
+        updatedAt: new Date(),
+        expiredAt: new Date(),
+        _expiredAt: formatDate(new Date())
 
     }
     return (
@@ -55,8 +58,10 @@ const CreateJobForm: React.FC<Props> = ({ create }) => {
             <Formik
                 initialValues={inititalValues}
                 onSubmit={(values, { setSubmitting }) => {
+                    values.isActive = values._isActive === "YES"
+                    values.expiredAt = new Date(values._expiredAt)
                     create(values).then(res => {
-                        values.isActive = values._isActive === "YES"
+                       
                         handleToast(res)
                         setSubmitting(false)
                         if (res.success) {
@@ -181,6 +186,13 @@ const CreateJobForm: React.FC<Props> = ({ create }) => {
                                 <option value={"YES"}>{"YES"}</option>
                                 <option value={"NO"}>{"NO"}</option>
                             </Select>
+
+                            <p className="mt-[20px] font-bold">
+                                Last date of application
+                            </p>
+
+                            <TextInput name='_expiredAt' onChange={handleChange} value={values._expiredAt} error={errors._expiredAt} show={touched._expiredAt ? true : false} className="w-full box-border mt-[10px]" type='date' />
+
 
                             <div className="mt-[30px] flex items-center p-5 pl-0 border-t border-gray-200 rounded-b dark:border-gray-600 pl-[0px]">
                                 <button data-modal-hide="default-modal" type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-[150px] flex justify-center items-center">
