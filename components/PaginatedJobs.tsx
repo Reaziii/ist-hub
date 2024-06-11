@@ -3,6 +3,8 @@ import { truncateString } from '@/utilities/string';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 import WhitelistJobButton from './WhitelistJobButton';
+import PageLoder from './PageLoder';
+import ButtonSpinner from './ButtonSpinner';
 
 interface Props {
     getPaginatedJobs: (page: number, limit: number) => Promise<ServerMessageInterface & { jobs: JobInterfaceWithUserData[] }>,
@@ -12,21 +14,29 @@ const PaginatedJobs: React.FC<Props> = ({ getPaginatedJobs, toggleWhiteList }) =
     const [page, setPage] = useState(1);
     const [jobs, setJobs] = useState<JobInterfaceWithUserData[]>([]);
     const [hasMore, setHasmore] = useState(true);
+    const [loading, setLoading] = useState(true);
+    const [showMoreLoding, setShowmoreLoading] = useState(false);
     const showMore = () => {
         if (!hasMore) return;
+        setShowmoreLoading(true);
         getPaginatedJobs(page + 1, 10).then((resp) => {
             setJobs([...jobs, ...resp.jobs])
             setPage(page + 1)
             if (resp.jobs.length === 0) setHasmore(false);
-
+            setShowmoreLoading(false);
         })
     }
     useEffect(() => {
+        setLoading(true);
         getPaginatedJobs(page, 10).then(resp => {
             setJobs([...resp.jobs])
             if (resp.jobs.length === 0) setHasmore(false);
+            setLoading(false);
         })
     }, [])
+    if (loading) {
+        return <PageLoder />
+    }
     return (
         <div className='flex flex-col items-center w-full'>
             <div>
@@ -61,9 +71,10 @@ const PaginatedJobs: React.FC<Props> = ({ getPaginatedJobs, toggleWhiteList }) =
                 }
             </div>
 
-            <button onClick={showMore} type="button" className="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 w-full rounded-[5px] mt-2">
+            <button onClick={showMore} type="button" className="h-[50px] me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 w-full rounded-[5px] mt-2 flex justify-center items-center">
                 {
-                    hasMore ? "Show More" : "No More Jobs"
+                    showMoreLoding ? <ButtonSpinner /> :
+                        hasMore ? "Show More" : "No More Jobs"
                 }
             </button>
 
