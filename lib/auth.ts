@@ -7,6 +7,7 @@ import { cookies } from "next/headers";
 import MongoConn from "./mongodb";
 import UserModel from "@/models/UserModel";
 import EmailVerificationModel from "@/models/EmailVerificationModel";
+import { ErrorMessage } from '@/constants';
 export const registration = async (name: string, email: string, dept: string, batch: number, roll: number, phone: string, pass: string, conPass: string): Promise<{ success: boolean, msg: string }> => {
     "use server";
     try {
@@ -185,14 +186,14 @@ export const forgetpassword = async (form: FormData): Promise<{ success: boolean
             return { success: false, msg: "Email is invalid" }
         }
 
-        let user = await UserModel.findOne({email, email_verified : true})
-        if(!user){
-            return {success : false, msg : "Invalid email address"}
+        let user = await UserModel.findOne({ email, email_verified: true })
+        if (!user) {
+            return { success: false, msg: "Invalid email address" }
         }
         const otp = otpgenerator.generate(6, { upperCaseAlphabets: false, specialChars: false })
         let verify = new EmailVerificationModel({
-            code : otp,
-            email : email
+            code: otp,
+            email: email
         })
         await verify.save();
         let mail = new sendmail(email as string, "Email Verification - IST HUB", `Your verification code is - ${otp}`)
@@ -219,11 +220,11 @@ export const verifyAndChangePassword = async (form: FormData): Promise<{ success
             return verify;
         }
         let user = await UserModel.findOne({
-            email : email,
+            email: email,
 
         })
-        if(!user){
-            return {success : false, msg : "Invalid email address"};
+        if (!user) {
+            return { success: false, msg: "Invalid email address" };
         }
         let hash = await bcrypt.hash(password, 10);
         user.password = hash;
@@ -238,4 +239,35 @@ export const verifyAndChangePassword = async (form: FormData): Promise<{ success
 export const logout = async () => {
     "use server";
     cookies().delete("token")
+}
+
+export const changePassword = async (oldpassword: string, password: string, confirmpassword: string): Promise<ServerMessageInterface> => {
+    "use server";
+    try {
+        if (password !== confirmpassword) {
+            return { success: false, msg: "New password and confirm password doesn't match" }
+        }
+        await MongoConn();
+        let usr = await user();
+        if (!usr.usr) {
+            return ErrorMessage.UNAUTHORIZED;
+        }
+        let _usr = await UserModel.findById(usr.usr._id);
+        if (!_usr) {
+            return ErrorMessage.UNAUTHORIZED;
+        }
+        let testOldPassword = await bcrypt.compare(oldpassword, _usr.password);
+        if (!testOldPassword) {
+            return { success: false, msg: "current password is incorrect" }
+        }
+        let hash = await bcrypt.hash(password, 10);
+        _usr.password = hash;
+        await _usr.save();
+        return { success: true, msg: "Password changed successfully!" }
+    }
+    catch (err) {
+        console.log("change password failed ===> \n", err)
+        return { success: false, msg: "Failed to change the password" }
+    }
+
 }

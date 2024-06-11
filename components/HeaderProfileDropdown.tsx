@@ -34,6 +34,9 @@ const HeaderProfileDropdown: React.FC<Props> = ({ user }) => {
                         <a href={`/profile/${user.username}/jobs`} className="block px-4 py-2 hover:bg-gray-100  ">My Jobs</a>
                     </li>
                     <li>
+                        <a href={`/settings/change-password`} className="block px-4 py-2 hover:bg-gray-100  ">Change password</a>
+                    </li>
+                    <li>
                         <a href="/logout" className="block px-4 py-2 hover:bg-gray-100  ">Sign out</a>
                     </li>
                 </ul>
