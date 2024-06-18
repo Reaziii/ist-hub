@@ -139,3 +139,21 @@ interface JobWhiteListInterface {
     userid: string,
     job_id: string,
 }
+
+interface AdminUserInterface {
+    name: string,
+    password: string,
+    email: string,
+    photo: string,
+    phone: string,
+    updated: boolean,
+    invitedBy: string,
+    _id: string
+}
+
+interface AdminUserInviationInterface {
+    email: string,
+    code: string,
+    time: Date,
+    invitedUserId:string
+}

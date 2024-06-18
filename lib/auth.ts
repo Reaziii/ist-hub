@@ -168,7 +168,6 @@ export const signNewToken = async (email?: string): Promise<{ token?: string }> 
             verified: _user.verified,
             _id: _user._id
         }, process.env.JWTSECRET ?? "ISTHUB")
-        console.log(token)
         cookies().set('token', token as string)
         return { token }
 
