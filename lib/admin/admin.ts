@@ -42,7 +42,6 @@ export const getProfileDetails = async (id?: string): Promise<ServerMessageInter
     "use server"
     try {
         if (!id) {
-            console.log(id)
             let admin = await Admin();
             if (!admin.admin) {
                 return ErrorMessage.UNAUTHORIZED;

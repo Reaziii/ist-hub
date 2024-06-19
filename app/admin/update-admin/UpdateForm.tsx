@@ -33,7 +33,7 @@ const UpdateAdmin: React.FC<Props> = ({ upload, admin, setAdmin, updateProfile }
         updated: admin.updated,
     }
     return (
-        <div className='border border-[#ccc] mt-[20px] rounded-lg p-[40px] overflow-hidden bg-white relative mb-[100px] flex-column'>
+        <div className='border mt-[20px] rounded-lg p-[40px] overflow-hidden bg-white relative mb-[100px] flex-column'>
             <UpdateProfilePicture upload={upload} oldPicture={admin.photo ?? ""} setProfilePic={(img: string) => { setAdmin({ ...admin, photo: img }) }} />
             <HorizontalBar />
             <Formik

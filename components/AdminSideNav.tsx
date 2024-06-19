@@ -67,7 +67,7 @@ const AdminSideNav: React.FC<Props> = ({ active }) => {
 
     ]
     return (
-        <div className='h-[100vh] w-[300px] bg-[#1C2434] fixed top-0 left-0'>
+        <div className='h-[100vh] w-[300px] bg-[#1C2434] fixed top-0 left-0 z-[101]'>
             <div className='h-[60px] w-full flex items-center justify-center'>
                 <h1 className='text-[white] font-bold text-[24px]'>ISTHUB admin</h1>
             </div>

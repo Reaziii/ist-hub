@@ -7,6 +7,7 @@ import MongoConn from "../mongodb";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt'
 import { ErrorMessage } from "@/constants";
+import AdminActivitieModel from "@/models/AdminActivitieModel";
 export const currentPath = async () => {
     "use server"
     let path = headers();
@@ -88,6 +89,12 @@ export const sendAdminInvitationLink = async (email: string): Promise<ServerMess
         let link = await currentPath();
         link = `${link}/admin/accept-invitation/?accessToken=${accessToken}`;
         let mail = new sendMail(email, "Accept invitation link - IST-HUB", `accept your invitation - <a href="${link}">${link}</a>`)
+        let adminActivity = new AdminActivitieModel({
+            title: "Admin Invitation Link sent",
+            userid: admin.admin._id,
+            message: `Sended a invitation link to ${email}`
+        })
+        adminActivity.save();
         await mail.send()
         let invitation = new AdminUserInvitationModel({
             code: otp,
@@ -115,7 +122,6 @@ export const checkInvitation = async (accessToken: string): Promise<ServerMessag
             code,
             email
         })
-        console.log(inv)
         if (!inv || !inv.time) {
             return {
                 success: false,
@@ -143,11 +149,11 @@ export const checkInvitation = async (accessToken: string): Promise<ServerMessag
             await admin.save();
         }
         await inv.deleteOne();
-        let token = await jwt.sign({ _id: admin._id }, process.env.JWTSECRET ?? "JWT");
+        let token = await jwt.sign({ _id: admin._id, name: "", email: inv.email, photo: "", phone: "" }, process.env.JWTSECRET ?? "JWT");
         cookies().set("admintoken", token);
         return { success: true, msg: "Valid invitation link" }
     } catch (err) {
-        console.log(err)
+        console.log("failed to check invitation link ===> \n", err)
         return { success: false, msg: "Failed to check the link" }
     }
 }
@@ -218,7 +224,7 @@ export const Login = async (email: string, password: string): Promise<ServerMess
         if (!test) {
             return { success: false, msg: "Password is incorrect" }
         }
-        let token = await jwt.sign({ _id: admin._id }, process.env.JWTSECRET ?? "JWT");
+        let token = await jwt.sign({ _id: admin._id, name: admin.name, phone: admin.phone, photo: admin.photo, email: admin.email }, process.env.JWTSECRET ?? "JWT");
         cookies().set("admintoken", token);
         return { success: true, msg: "Successfully loggedin", token }
     } catch (err) {

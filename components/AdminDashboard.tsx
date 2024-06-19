@@ -3,19 +3,32 @@ import React, { useEffect, useState } from 'react'
 import AdminSideNav from './AdminSideNav'
 import { redirect, useRouter } from 'next/navigation';
 import ButtonSpinner from './ButtonSpinner';
-
+import jwt from 'jsonwebtoken'
 interface Props {
-    children: (admin: { admin: AdminUserInterface, setAdmin: (admin: AdminUserInterface) => void }) => React.ReactElement,
+    children: (admin: { admin: AdminUserInterface, setAdmin: (admin: AdminUserInterface) => void, setLoading: (loading: boolean) => void, loading: boolean }) => React.ReactElement,
     active: string,
     getProfileDetails: () => Promise<ServerMessageInterface & { admin?: AdminUserInterface }>
 }
+
+const getTokenDetails = (): { email: string, name: string, photo: string, phone: string, _id: string } | null => {
+    return null;
+}
+
 const AdminDashboard: React.FC<Props> = ({ children: Component, active, getProfileDetails }) => {
-    const [admin, setAdmin] = React.useState<AdminUserInterface | null>(null);
+    let details = getTokenDetails();
+    const [admin, setAdmin] = React.useState<AdminUserInterface | null>(details === null ? null : {
+        ...details,
+        invitedBy: "",
+        updated: false,
+        password: "",
+
+    });
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     useEffect(() => {
         if (loading) return;
         setLoading(() => true);
+
         getProfileDetails().then(resp => {
             if (resp.admin) {
                 setAdmin({ ...resp.admin });
@@ -29,7 +42,7 @@ const AdminDashboard: React.FC<Props> = ({ children: Component, active, getProfi
     }, [])
     return (
         <div>
-            <div className='h-[60px] w-full fixed top-0 left-0 pl-[300px] border-box shadow-2 px-10 flex items-center justify-end bg-[white]'>
+            <div className='h-[60px] w-full fixed top-0 left-0 pl-[300px] border-box shadow-2 px-10 flex items-center justify-end bg-[white] z-[100]'>
                 <div className="flex items-center gap-4">
                     <div>
                         <h1 className='font-bold'>{admin?.name.length ? admin.name : "Admin"}</h1>
@@ -50,12 +63,12 @@ const AdminDashboard: React.FC<Props> = ({ children: Component, active, getProfi
             <div className='pl-[300px] pt-[60px] w-full min-h-[100vh] bg-[#F1F5F9]'>
                 <div className="w-full p-[20px]">
                     {
-                        loading || !admin  ?
+                        loading || !admin ?
                             <div className='w-full h-[100vh] flex items-center justify-center'>
                                 <ButtonSpinner />
                             </div>
                             :
-                            <Component admin={admin} setAdmin={setAdmin} />
+                            <Component admin={admin} setAdmin={setAdmin} setLoading={setLoading} loading={loading} />
 
                     }
                 </div>

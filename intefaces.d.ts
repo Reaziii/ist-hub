@@ -18,6 +18,7 @@ interface UserInterface {
     bio: string,
     about: string,
     resume: string,
+    _id: string
 }
 
 interface EducationInterface {
@@ -156,4 +157,10 @@ interface AdminUserInviationInterface {
     code: string,
     time: Date,
     invitedUserId:string
+}
+
+interface ActivitiesInterface{
+    userid:string,
+    title:string,
+    message:string
 }

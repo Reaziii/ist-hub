@@ -209,7 +209,6 @@ export const searchProfile = async (skills: string[]): Promise<ServerMessageInte
         })
 
         let user = await UserModel.aggregate<ShortUserInterface>(pipeline);
-        console.log(user)
         for (let i = 0; i < user.length; i++) {
             user[i]._id = String(user[i]._id);
             for (let j = 0; j < user[i].skills.length; j++) {
