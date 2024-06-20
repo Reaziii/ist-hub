@@ -3,12 +3,19 @@ import { Admin } from "./auth";
 import { ErrorMessage } from "@/constants";
 import { UserSearchParams } from "@/app/admin/users/SearchBar";
 import { PipelineStage } from "mongoose";
+import AdminActivitieModel from "@/models/AdminActivitieModel";
+import JobModel from "@/models/JobModel";
+import EducationModel from "@/models/EducationModel";
+import ExperienceModel from "@/models/ExperienceModel";
+import JobWhitelistModel from "@/models/JobWhitelistModel";
+import SkillModel from "@/models/SkillModel";
+import UserVerifier from "@/models/UserVerifier";
 
 
-export const getAllUsers = async (params?: UserSearchParams): Promise<ServerMessageInterface & { users: UserInterface[] }> => {
+export const getAllUsers = async (page: number, params?: UserSearchParams): Promise<ServerMessageInterface & { users: UserInterface[] }> => {
     "use server";
     try {
-        console.log(params)
+
         let admin = await Admin();
         if (!admin.admin) {
             return { ...ErrorMessage.UNAUTHORIZED, users: [] };
@@ -42,14 +49,23 @@ export const getAllUsers = async (params?: UserSearchParams): Promise<ServerMess
                 }
             })
         }
+        const skip = (page - 1) * 10;
+
         let users: UserInterface[] = [];
         if (pipeline.length === 0) {
-            users = await UserModel.find().lean();
+            users = await UserModel.find().lean()
+                .sort({ createdAt: 1 })
+                .skip(skip)
+                .limit(10)
+                .lean();
         }
         else {
             users = await UserModel.aggregate<UserInterface>(pipeline)
+                .sort({ createdAt: 1 })
+                .skip(skip)
+                .limit(10)
         }
-        users = users.map(item => ({ ...item, _id: String(item._id), password : "" }))
+        users = users.map(item => ({ ...item, _id: String(item._id), password: "" }))
         return { success: true, msg: "Successfully fetched users", users: users }
     } catch (err) {
         console.log("admin - user fetch failed ===> \n", err)
@@ -58,3 +74,68 @@ export const getAllUsers = async (params?: UserSearchParams): Promise<ServerMess
     }
 }
 
+export const deleteAnUser = async (userid: string): Promise<ServerMessageInterface> => {
+    "use server";
+    try {
+        let _admin = await Admin();
+        if (!_admin.admin) return ErrorMessage.UNAUTHORIZED;
+        let user = await UserModel.findById(userid);
+        if (!user) {
+            return { success: false, msg: "User doesn't exists" }
+        }
+        let activity = new AdminActivitieModel({
+            title: "An user deleted",
+            message: `Roll - ${user.roll_no} from batch ${user.batch} has been deleted`,
+            userid: _admin.admin._id,
+            time: new Date()
+        })
+        await user.deleteOne();
+        await JobModel.deleteMany({ userid })
+        await EducationModel.deleteMany({ userid });
+        await ExperienceModel.deleteMany({ userid });
+        await JobWhitelistModel.deleteMany({ userid });
+        await SkillModel.deleteMany({ userid });
+        await activity.save();
+        return { success: true, msg: "User deleted successfully" }
+    } catch (err) {
+        console.log("admin - user deletation failed ===> \n", err);
+        return { success: false, msg: "Failed to delete user" }
+    }
+}
+
+export const toogleVerified = async (userid: string): Promise<ServerMessageInterface> => {
+    "use server";
+    try {
+        let _admin = await Admin();
+        if (!_admin.admin) return ErrorMessage.UNAUTHORIZED;
+        let user = await UserModel.findById(userid);
+        if (!user) {
+            return { success: false, msg: "User doesn't exists" }
+        }
+        let text = "verified";
+        if (user.verified) text = "unverified"
+        let activity = new AdminActivitieModel({
+            title: "An user verified",
+            message: `Roll - ${user.roll_no} from batch ${user.batch} has been ${text}`,
+            userid: _admin.admin._id,
+            time: new Date()
+        })
+        user.verified = !user.verified;
+        let verifier = await UserVerifier.findOne({ owner: userid });
+        if (!verifier) {
+            verifier = new UserVerifier({
+                owner: userid,
+                verifiedAt: new Date(),
+                verfier: _admin.admin._id
+            })
+        }
+        verifier.verfier = _admin.admin._id;
+        await verifier.save();
+        await user.save();
+        await activity.save();
+        return { success: true, msg: "User text successfully" }
+    } catch (err) {
+        console.log("admin - user verification failed ===> \n", err);
+        return { success: false, msg: "Failed to verify user" }
+    }
+}

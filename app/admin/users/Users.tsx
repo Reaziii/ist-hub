@@ -5,15 +5,18 @@ import UsersCard from './UsersCard'
 import { UserSearchParams } from './SearchBar'
 interface Props {
     getProfileDetails: () => Promise<ServerMessageInterface & { admin?: AdminUserInterface }>,
-    getUsers: (params: UserSearchParams) => Promise<ServerMessageInterface & { users: UserInterface[] }>
+    getUsers: (page: number, params: UserSearchParams) => Promise<ServerMessageInterface & { users: UserInterface[] }>,
+    deleteUser: (userid: string) => Promise<ServerMessageInterface>,
+    toggleVerify: (userid: string) => Promise<ServerMessageInterface>
+
 
 }
-const Users: FC<Props> = ({ getProfileDetails, getUsers }) => {
+const Users: FC<Props> = ({ getProfileDetails, getUsers, deleteUser, toggleVerify }) => {
     return (
         <AdminDashboard getProfileDetails={getProfileDetails} active='Users'>
             {
                 ({ admin, setAdmin }) => {
-                    return <UsersCard getUsers={getUsers} />
+                    return <UsersCard getUsers={getUsers} deleteUser={deleteUser} toggleVerify={toggleVerify} />
                 }
             }
         </AdminDashboard>

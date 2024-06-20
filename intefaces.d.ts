@@ -162,5 +162,6 @@ interface AdminUserInviationInterface {
 interface ActivitiesInterface{
     userid:string,
     title:string,
-    message:string
+    message:string,
+    time : Date
 }

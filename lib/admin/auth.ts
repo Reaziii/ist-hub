@@ -92,7 +92,8 @@ export const sendAdminInvitationLink = async (email: string): Promise<ServerMess
         let adminActivity = new AdminActivitieModel({
             title: "Admin Invitation Link sent",
             userid: admin.admin._id,
-            message: `Sended a invitation link to ${email}`
+            message: `An invitation link sent to <a href="mailto:${email}">${email}</a>`,
+            time : new Date()
         })
         adminActivity.save();
         await mail.send()

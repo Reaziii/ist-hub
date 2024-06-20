@@ -57,6 +57,14 @@ const AdminSideNav: React.FC<Props> = ({ active }) => {
             </div>
         },
         {
+            title: "Activities",
+            path: "/admin/activities",
+            active: active === "Activities",
+            icon: <div>
+                <i className="fas fa-tasks"></i>
+            </div>
+        },
+        {
             title: "Logout",
             path: "/admin/logout",
             active: active === "Logout",

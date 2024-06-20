@@ -4,12 +4,15 @@ import { FC, useEffect, useState } from 'react';
 import SearchParametersBar, { UserSearchParams } from './SearchBar';
 import HorizontalBar from '@/components/HorizontalBar';
 interface Props {
-    getUsers: (parameters: UserSearchParams) => Promise<ServerMessageInterface & { users: UserInterface[] }>,
+    getUsers: (page:number,parameters: UserSearchParams) => Promise<ServerMessageInterface & { users: UserInterface[] }>,
+    deleteUser: (userid: string) => Promise<ServerMessageInterface>,
+    toggleVerify: (userid: string) => Promise<ServerMessageInterface>
 }
-const UsersCard: FC<Props> = ({ getUsers }) => {
+const UsersCard: FC<Props> = ({ getUsers, deleteUser, toggleVerify }) => {
     const [users, setUsers] = useState<UserInterface[]>([]);
     const [loading, setLoading] = useState(true);
     const [openDD, setOpenDD] = useState<number>(-1)
+    const [page,setPage] = useState(1);
     let [parameters, setParameters] = useState<UserSearchParams>({
         dept: "ALL",
         roll: "",
@@ -18,7 +21,7 @@ const UsersCard: FC<Props> = ({ getUsers }) => {
     })
     const handleSearch = () => {
         setLoading(true)
-        getUsers(parameters).then(res => {
+        getUsers(page, parameters).then(res => {
             if (res.success) {
                 setUsers([...res.users])
             }
@@ -29,7 +32,7 @@ const UsersCard: FC<Props> = ({ getUsers }) => {
         })
     }
     useEffect(() => {
-        getUsers(parameters).then(res => {
+        getUsers(page, parameters).then(res => {
             if (res.success) {
                 setUsers([...res.users])
             }
@@ -39,6 +42,26 @@ const UsersCard: FC<Props> = ({ getUsers }) => {
             setLoading(false);
         })
     }, [])
+    const handleDeleteUser = (userid: string) => {
+        deleteUser(userid).then(resp => {
+            if (resp.success) {
+                let _ = users.filter(item => (item._id !== userid));
+                setUsers([..._]);
+            }
+            handleToast(resp)
+
+        })
+    }
+    const handleToggleVerify = (key: number) => {
+        toggleVerify(users[key]._id).then(resp => {
+            handleToast(resp);
+            if (resp.success) {
+                let _ = users;
+                _[key].verified = !_[key].verified;
+                setUsers([..._])
+            }
+        })
+    }
     return <div className='px-2 py-2 mx-auto'>
         <div className='w-full bg-white rounded-lg shadow'>
             <div className='p-6'>
@@ -91,10 +114,12 @@ const UsersCard: FC<Props> = ({ getUsers }) => {
                                         openDD === key && <div id="dropdownHover" className="z-10 absolute bg-white divide-y divide-gray-100 rounded-lg shadow w-40 dark:bg-gray-700 right-[100%] top-0">
                                             <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownHoverButton">
                                                 <li>
-                                                    <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Toogle Verified</a>
+                                                    <a onClick={() => {
+                                                        handleToggleVerify(key)
+                                                    }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">{item.verified ? "Unverify" : "verify"}</a>
                                                 </li>
                                                 <li>
-                                                    <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-red-500">Delete User</a>
+                                                    <a onClick={() => handleDeleteUser(item._id)} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-red-500">Delete User</a>
                                                 </li>
 
                                             </ul>
