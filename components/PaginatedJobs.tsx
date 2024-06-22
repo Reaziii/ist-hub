@@ -42,7 +42,7 @@ const PaginatedJobs: React.FC<Props> = ({ getPaginatedJobs, toggleWhiteList }) =
             <div>
                 {
                     jobs.map((item, key) => (
-                        <div key={key} className='border border-[#ccc] mt-[20px] rounded-lg p-[40px] overflow-hidden bg-white relative'>
+                        <div key={key} className='border mt-[20px] rounded-lg p-[40px] overflow-hidden bg-white relative'>
                             <WhitelistJobButton whitelisted={item.whitelisted} toggleWhitelist={toggleWhiteList} job_id={item._id} />
                             <a href={`/profile/${item.username}`} target='_blank'>{item.fullname}</a>
                             <div className='pt-2' />

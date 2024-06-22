@@ -151,13 +151,20 @@ export const impersonateLogin = async (userid: string): Promise<ServerMessageInt
             return ErrorMessage.UNAUTHORIZED
         }
 
-        let user = await UserModel.findById(userid);
+        let user = await UserModel.findById(userid).lean();
         if (!user) {
             return { success: false, msg: "User doesn't exists" };
         }
         await signNewToken(user.email);
         let link = await currentPath();
         link = `/profile/${user.username}`;
+        let activity = new AdminActivitieModel({
+            userid: admin.admin._id,
+            title: "Started impersonating",
+            time : new Date(),
+            message: `Admin has started impersonating to <a target="_blank" href="${await currentPath()}/profile/${user.username}">${user.fullname}</a>`
+        })
+        await activity.save();
         return { success: true, msg: "Successfully loggedin", link }
     } catch (err) {
         console.log("failed to impersonate login ===> \n", err);

@@ -165,3 +165,15 @@ interface ActivitiesInterface{
     message:string,
     time : Date
 }
+
+interface ReportInterface{
+    reportedBy: string,
+    reportedTime: date,
+    report : string,
+    status:number,
+    email : string,
+    title : string,
+    startedResolving : boolean,
+    resolvedBy : string,
+    _id : string
+}

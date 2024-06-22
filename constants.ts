@@ -9,3 +9,9 @@ export enum EmployeeType {
 export const ErrorMessage = {
     UNAUTHORIZED: { success: false, msg: "Please sign in to get this feature" }
 }
+
+export enum ReportStatusType {
+    PENDING  = 1,
+    RESOLVED = 2,
+    CANCELED = 3
+}

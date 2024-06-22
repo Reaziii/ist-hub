@@ -38,6 +38,14 @@ const AdminSideNav: React.FC<Props> = ({ active }) => {
             </div>
         },
         {
+            title: "Reports",
+            path: "/admin/reports",
+            active: active === "Reports",
+            icon: <div>
+                <i className="fa-solid fa-circle-exclamation"></i>
+            </div>
+        },
+        {
             title: "Account Settings",
             path: "/admin/update-admin",
             active: active === "Update Admin",
@@ -72,6 +80,7 @@ const AdminSideNav: React.FC<Props> = ({ active }) => {
                 <i className="fa-solid fa-arrow-right-from-bracket"></i>
             </div>
         },
+        
 
     ]
     return (
