@@ -1,5 +1,5 @@
 import UserModel from "@/models/UserModel";
-import { Admin } from "./auth";
+import { Admin, currentPath } from "./auth";
 import { ErrorMessage } from "@/constants";
 import { UserSearchParams } from "@/app/admin/users/SearchBar";
 import { PipelineStage } from "mongoose";
@@ -10,6 +10,8 @@ import ExperienceModel from "@/models/ExperienceModel";
 import JobWhitelistModel from "@/models/JobWhitelistModel";
 import SkillModel from "@/models/SkillModel";
 import UserVerifier from "@/models/UserVerifier";
+import MongoConn from "../mongodb";
+import { signNewToken } from "../auth";
 
 
 export const getAllUsers = async (page: number, params?: UserSearchParams): Promise<ServerMessageInterface & { users: UserInterface[] }> => {
@@ -137,5 +139,28 @@ export const toogleVerified = async (userid: string): Promise<ServerMessageInter
     } catch (err) {
         console.log("admin - user verification failed ===> \n", err);
         return { success: false, msg: "Failed to verify user" }
+    }
+}
+
+export const impersonateLogin = async (userid: string): Promise<ServerMessageInterface & { link?: string }> => {
+    "use server";
+    try {
+        await MongoConn();
+        let admin = await Admin();
+        if (!admin.admin) {
+            return ErrorMessage.UNAUTHORIZED
+        }
+
+        let user = await UserModel.findById(userid);
+        if (!user) {
+            return { success: false, msg: "User doesn't exists" };
+        }
+        await signNewToken(user.email);
+        let link = await currentPath();
+        link = `/profile/${user.username}`;
+        return { success: true, msg: "Successfully loggedin", link }
+    } catch (err) {
+        console.log("failed to impersonate login ===> \n", err);
+        return { success: false, msg: "Failed to impoersontate" }
     }
 }

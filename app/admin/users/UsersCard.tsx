@@ -3,16 +3,20 @@ import handleToast from '@/components/handleToast';
 import { FC, useEffect, useState } from 'react';
 import SearchParametersBar, { UserSearchParams } from './SearchBar';
 import HorizontalBar from '@/components/HorizontalBar';
+import ButtonSpinner from '@/components/ButtonSpinner';
 interface Props {
-    getUsers: (page:number,parameters: UserSearchParams) => Promise<ServerMessageInterface & { users: UserInterface[] }>,
+    getUsers: (page: number, parameters: UserSearchParams) => Promise<ServerMessageInterface & { users: UserInterface[] }>,
     deleteUser: (userid: string) => Promise<ServerMessageInterface>,
-    toggleVerify: (userid: string) => Promise<ServerMessageInterface>
+    toggleVerify: (userid: string) => Promise<ServerMessageInterface>,
+    impersonate: (userid: string) => Promise<ServerMessageInterface & { link?: string }>,
 }
-const UsersCard: FC<Props> = ({ getUsers, deleteUser, toggleVerify }) => {
+const UsersCard: FC<Props> = ({ getUsers, deleteUser, toggleVerify, impersonate }) => {
     const [users, setUsers] = useState<UserInterface[]>([]);
     const [loading, setLoading] = useState(true);
     const [openDD, setOpenDD] = useState<number>(-1)
-    const [page,setPage] = useState(1);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [showMoreLoding, setShowMoreLoading] = useState(false);
     let [parameters, setParameters] = useState<UserSearchParams>({
         dept: "ALL",
         roll: "",
@@ -20,21 +24,22 @@ const UsersCard: FC<Props> = ({ getUsers, deleteUser, toggleVerify }) => {
         batch: ""
     })
     const handleSearch = () => {
-        setLoading(true)
         getUsers(page, parameters).then(res => {
             if (res.success) {
-                setUsers([...res.users])
+                setUsers([...users, ...res.users])
+                setPage(page + 1)
+                if (res.users.length === 0) setHasMore(false)
             }
             else {
                 handleToast(res)
             }
-            setLoading(false);
         })
     }
     useEffect(() => {
         getUsers(page, parameters).then(res => {
             if (res.success) {
                 setUsers([...res.users])
+                setPage(page + 1)
             }
             else {
                 handleToast(res)
@@ -61,6 +66,9 @@ const UsersCard: FC<Props> = ({ getUsers, deleteUser, toggleVerify }) => {
                 setUsers([..._])
             }
         })
+    }
+    const showMore = () => {
+        handleSearch();
     }
     return <div className='px-2 py-2 mx-auto'>
         <div className='w-full bg-white rounded-lg shadow'>
@@ -119,8 +127,19 @@ const UsersCard: FC<Props> = ({ getUsers, deleteUser, toggleVerify }) => {
                                                     }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">{item.verified ? "Unverify" : "verify"}</a>
                                                 </li>
                                                 <li>
+                                                    <a onClick={() => {
+                                                        impersonate(item._id).then(resp => {
+                                                            if (resp.success && resp.link) {
+                                                                window.open(window.location.protocol+"//"+window.location.host+ resp.link, "_blank")
+                                                            }
+                                                            else { handleToast(resp) }
+                                                        })
+                                                    }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Impersonate</a>
+                                                </li>
+                                                <li>
                                                     <a onClick={() => handleDeleteUser(item._id)} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-red-500">Delete User</a>
                                                 </li>
+                                                
 
                                             </ul>
                                         </div>
@@ -131,6 +150,13 @@ const UsersCard: FC<Props> = ({ getUsers, deleteUser, toggleVerify }) => {
                             </div>
                         ))
                 }
+
+                <button onClick={showMore} type="button" className="h-[50px] me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 w-full rounded-[5px] mt-2 flex justify-center items-center">
+                    {
+                        showMoreLoding ? <ButtonSpinner /> :
+                            hasMore ? "Show More" : "No More User"
+                    }
+                </button>
             </div>
         </div>
     </div>
