@@ -104,7 +104,7 @@ export const resolvedReport = async (id: string): Promise<ServerMessageInterface
         if (report.resolvedBy !== admin.admin._id) return { success: false, msg: "You are not allowed to resolve" }
         report.status = ReportStatusType.RESOLVED
         let activity = new AdminActivitieModel({
-            title: "Report resolving started",
+            title: "Report resolved",
             message: `Resolved report - <a href="/admin/reports/${report._id}">${truncateString(report.report, 10)}</a>`,
             userid: admin.admin._id,
             time: new Date()
