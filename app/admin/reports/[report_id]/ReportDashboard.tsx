@@ -4,7 +4,7 @@ import React, { FC } from 'react'
 import Report from './Report'
 interface Props {
     getProfileDetails: () => Promise<ServerMessageInterface & { admin?: AdminUserInterface }>,
-    getReport: (id: string) => Promise<ServerMessageInterface & { report?: ReportInterface, resolver?: boolean }>,
+    getReport: (id: string) => Promise<ServerMessageInterface & { report?: ReportInterface, resolver?: boolean, username:string, fullname:string, resolverAccount?:AdminUserInterface }>,
     report_id: string,
     startResolving: (id: string) => Promise<ServerMessageInterface>,
     resolved: (id: string) => Promise<ServerMessageInterface>
