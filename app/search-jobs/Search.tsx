@@ -9,7 +9,7 @@ import ButtonSpinner from '@/components/ButtonSpinner'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 
-const Search: React.FC= () => {
+const Search: React.FC = () => {
     const router = useRouter();
     const path = usePathname();
     const params = useSearchParams();
@@ -21,7 +21,7 @@ const Search: React.FC= () => {
         tempTag: ""
     } = {
         type: _type ?? EmployeeType.FULL_TIME,
-        tags: _tags?.split(',').map(item => ({ tag: item, _id: "", job_id: "" })) ?? [],
+        tags: _tags && _tags.length > 0 ? _tags.split(',').map(item => ({ tag: item, _id: "", job_id: "" })) : [],
         tempTag: "",
     }
 

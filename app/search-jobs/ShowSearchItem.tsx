@@ -19,7 +19,7 @@ const JobSearchItem: React.FC<Props> = ({ searchJobs }) => {
     let [jobs, setJobs] = useState<JobInterfaceWithUserData[]>([])
     let [tags, setTags] = useState<string[]>([])
     useEffect(() => {
-        if (_tags)
+        if (_tags && _tags.length>0)
             setTags(_tags.split(','))
     }, [_tags])
     useEffect(() => {
@@ -27,6 +27,8 @@ const JobSearchItem: React.FC<Props> = ({ searchJobs }) => {
             setJobs([...resp.jobs])
         })
     }, [tags, _type])
+
+
     return <div className="pb-10">
         {
             jobs.map((item, key) => (

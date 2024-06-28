@@ -51,6 +51,7 @@ export const getAllUsers = async (page: number, params?: UserSearchParams): Prom
                 }
             })
         }
+
         const skip = (page - 1) * 10;
 
         let users: UserInterface[] = [];
@@ -62,10 +63,13 @@ export const getAllUsers = async (page: number, params?: UserSearchParams): Prom
                 .lean();
         }
         else {
+            console.log("hello world")
             users = await UserModel.aggregate<UserInterface>(pipeline)
                 .sort({ createdAt: 1 })
                 .skip(skip)
                 .limit(10)
+
+            console.log(users)
         }
         users = users.map(item => ({ ...item, _id: String(item._id), password: "" }))
         return { success: true, msg: "Successfully fetched users", users: users }

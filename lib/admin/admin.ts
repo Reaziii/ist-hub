@@ -4,7 +4,6 @@ import { cloudinaryImageUploadMethod } from "../upload";
 import { Admin } from "./auth";
 import AdminUserModel from "@/models/AdminUserModel";
 import AdminActivitieModel from "@/models/AdminActivitieModel";
-import { time } from "console";
 
 
 export const UploadProfilePicture = async (form: FormData): Promise<ServerMessageInterface & { img?: string }> => {
@@ -94,5 +93,77 @@ export const getActivities = async (adminid?: string): Promise<ServerMessageInte
 
     } catch (err) {
         return { success: false, msg: "Failed to retrive activities", activities: [] }
+    }
+}
+
+export const deActivateAccount = async (userid?: string): Promise<ServerMessageInterface> => {
+    "use server";
+    try {
+        let admin = await Admin();
+        if (!admin.admin) return ErrorMessage.UNAUTHORIZED;
+        let _admin = await AdminUserModel.findById(userid ? userid : admin.admin._id);
+        if (!_admin) return ErrorMessage.UNAUTHORIZED;
+        if (_admin.invitedBy === "owner") {
+            return { success: false, msg: "You can't deactivate this account!" }
+        }
+        _admin.isActive = false;
+        await _admin.save();
+        return { success: true, msg: "You have deactivated the account!" + (userid ? "" : " to reactive please contuct other admins") }
+    } catch (err) {
+        console.log("deactive admin account failed ===> \n", err);
+        return { success: false, msg: "Failed to deactive admin account" }
+    }
+}
+
+
+export const getAdminUsers = async (): Promise<ServerMessageInterface & { admins: (AdminUserInterface & { invitedAdmin: string })[] }> => {
+    "use server";
+    try {
+        let _admin = await Admin();
+        if (!_admin.admin) return { success: false, msg: "You are not authorized", admins: [] }
+        let admins = await AdminUserModel.find().lean();
+        let ret: (AdminUserInterface & { invitedAdmin: string })[] = [];
+        for (let i = 0; i < admins.length; i++) {
+            if (!admins[i].updated) continue;
+            let inv = (admins.filter(item => (String(item._id) === admins[i].invitedBy)));
+            let email: string = "Root Admin";
+            if (inv.length > 0) email = inv[0].email;
+            ret.push({
+                ...admins[i],
+                password: "",
+                invitedAdmin: email,
+                _id: String(admins[i]._id)
+            })
+        }
+        return { success: true, msg: "Admin retrived", admins: ret }
+
+    } catch (err) {
+        console.log("Failed to retrive admins ===> \n", err);
+        return { success: false, msg: "Failed to retrive admins", admins: [] }
+    }
+}
+
+export const toggleAdminActive = async (adminid: string): Promise<ServerMessageInterface & { isMe?: boolean }> => {
+    "use server";
+    try {
+        let admin = await Admin();
+        if (!admin.admin) return ErrorMessage.UNAUTHORIZED;
+        let _admin = await AdminUserModel.findById(adminid);
+        if (!_admin) return { success: false, msg: "Admin doesn't exists" }
+        if (_admin.invitedBy === "owner") return { success: false, msg: "Can't toggle root user" }
+        _admin.isActive = !_admin.isActive;
+        let title = "Activated";
+        if (_admin.isActive === false) title = "Deactivated"
+        let activity = new AdminActivitieModel({
+            title: `${title} an admin account`,
+            message: `${title} an admin account. Account email - ${_admin.email}`,
+            time: new Date(),
+            userid: admin.admin._id
+        })
+        await _admin.save();
+        await activity.save();
+        return { success: true, msg: "Admin updated successfully", isMe: (adminid === admin.admin._id) }
+    } catch (err) {
+        return { success: false, msg: "Failed to update admin" }
     }
 }

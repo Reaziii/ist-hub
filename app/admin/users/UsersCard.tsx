@@ -23,11 +23,18 @@ const UsersCard: FC<Props> = ({ getUsers, deleteUser, toggleVerify, impersonate 
         verified: "ALL",
         batch: ""
     })
-    const handleSearch = () => {
-        getUsers(page, parameters).then(res => {
+    const handleSearch = (_page?: number, _users?: UserInterface[]) => {
+        if (_page===undefined || _page===null) {
+            return ;
+
+        }
+        if (!_users) return ;
+        getUsers(_page, parameters).then(res => {
+            console.log(page, users);
+
             if (res.success) {
-                setUsers([...users, ...res.users])
-                setPage(page + 1)
+                setUsers([..._users, ...res.users])
+                setPage(_page + 1)
                 if (res.users.length === 0) setHasMore(false)
             }
             else {
@@ -81,7 +88,7 @@ const UsersCard: FC<Props> = ({ getUsers, deleteUser, toggleVerify, impersonate 
                     loading ? <FullPageLoader loading={true} /> :
 
                         users.map((item, key) => (
-                            <div className='relative h-[160px] py-[10px] border border-gray-200 border-0 border-b-[1px] mt-5 flex items-center'>
+                            <div key={key} className='relative h-[160px] py-[10px] border border-gray-200 border-0 border-b-[1px] mt-5 flex items-center'>
                                 <div className='h-[140px] w-[180px]'>
                                     <img src={item.photo ?? "/defaultdp.png"} className="h-full w-full" />
                                 </div>
@@ -130,7 +137,7 @@ const UsersCard: FC<Props> = ({ getUsers, deleteUser, toggleVerify, impersonate 
                                                     <a onClick={() => {
                                                         impersonate(item._id).then(resp => {
                                                             if (resp.success && resp.link) {
-                                                                window.open(window.location.protocol+"//"+window.location.host+ resp.link, "_blank")
+                                                                window.open(window.location.protocol + "//" + window.location.host + resp.link, "_blank")
                                                             }
                                                             else { handleToast(resp) }
                                                         })
@@ -139,7 +146,7 @@ const UsersCard: FC<Props> = ({ getUsers, deleteUser, toggleVerify, impersonate 
                                                 <li>
                                                     <a onClick={() => handleDeleteUser(item._id)} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-red-500">Delete User</a>
                                                 </li>
-                                                
+
 
                                             </ul>
                                         </div>

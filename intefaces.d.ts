@@ -149,7 +149,8 @@ interface AdminUserInterface {
     phone: string,
     updated: boolean,
     invitedBy: string,
-    _id: string
+    _id: string,
+    isActive : boolean,
 }
 
 interface AdminUserInviationInterface {

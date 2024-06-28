@@ -16,13 +16,7 @@ const getTokenDetails = (): { email: string, name: string, photo: string, phone:
 
 const AdminDashboard: React.FC<Props> = ({ children: Component, active, getProfileDetails }) => {
     let details = getTokenDetails();
-    const [admin, setAdmin] = React.useState<AdminUserInterface | null>(details === null ? null : {
-        ...details,
-        invitedBy: "",
-        updated: false,
-        password: "",
-
-    });
+    const [admin, setAdmin] = React.useState<AdminUserInterface | null>(null);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     useEffect(() => {

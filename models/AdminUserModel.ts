@@ -10,7 +10,11 @@ const schema = new mongoose.Schema<AdminUserInterface & mongoose.Document>({
         type: Boolean,
         default: false
     },
-    invitedBy: String
+    invitedBy: String,
+    isActive : {
+        type : Boolean,
+        default : true
+    }
 })
 
 export default (mongoose.models.admins || mongoose.model("admins", schema)) as mongoose.Model<AdminUserInterface & mongoose.Document>

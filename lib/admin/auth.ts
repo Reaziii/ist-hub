@@ -22,7 +22,7 @@ export const Admin = async (): Promise<ServerMessageInterface & { admin?: AdminU
         if (!token) throw "";
         let _ = await jwt.verify(token.value, process.env.JWTSECRET ?? "") as { _id: string }
         let admin = await AdminUserModel.findById(_._id).lean();
-        if (!admin) throw "";
+        if (!admin || !admin.isActive) return ErrorMessage.UNAUTHORIZED;
         admin._id = String(admin._id)
         return { success: true, msg: "User Logged In", admin }
     } catch (err) {
@@ -220,6 +220,9 @@ export const Login = async (email: string, password: string): Promise<ServerMess
         let admin = await AdminUserModel.findOne({ email });
         if (!admin) {
             return { success: false, msg: "Email not found" }
+        }
+        if(!admin.isActive){
+            return {success : false,msg : "Account is not active"}
         }
         let test = await bcrypt.compare(password, admin.password);
         if (!test) {

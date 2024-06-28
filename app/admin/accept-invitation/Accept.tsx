@@ -13,7 +13,7 @@ const Accept: React.FC<Props> = ({  accessToken, checkInvitation }) => {
     useEffect(() => {
         checkInvitation(accessToken).then(resp => {
             if (resp.success) {
-                router.push("/admin/update-admin")
+                router.push("/admin/change-password")
             }
             else {
                 setStatus({ ...resp, loading: false })

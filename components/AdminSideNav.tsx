@@ -46,6 +46,14 @@ const AdminSideNav: React.FC<Props> = ({ active }) => {
             </div>
         },
         {
+            title: "Admin Accounts",
+            path: "/admin/admin-accounts",
+            active: active === "Admin Accounts",
+            icon: <div>
+                <i className="fa-solid fa-users"></i>
+            </div>
+        },
+        {
             title: "Account Settings",
             path: "/admin/update-admin",
             active: active === "Update Admin",
