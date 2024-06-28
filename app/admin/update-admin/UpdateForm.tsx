@@ -31,6 +31,7 @@ const UpdateAdmin: React.FC<Props> = ({ upload, admin, setAdmin, updateProfile }
         password: "",
         _id: admin._id,
         updated: admin.updated,
+        isActive : true
     }
     return (
         <div className='border mt-[20px] rounded-lg p-[40px] overflow-hidden bg-white relative mb-[100px] flex-column'>
