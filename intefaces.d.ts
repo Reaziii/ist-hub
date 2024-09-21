@@ -133,7 +133,8 @@ interface ShortUserInterface {
 interface UserVerifierInterface {
     verfier: string,
     owner: string,
-    verifiedAt: Date
+    verifiedAt: Date,
+    byAdmin : Boolean
 }
 
 interface JobWhiteListInterface {

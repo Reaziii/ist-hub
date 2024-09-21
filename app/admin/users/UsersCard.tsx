@@ -30,8 +30,6 @@ const UsersCard: FC<Props> = ({ getUsers, deleteUser, toggleVerify, impersonate 
         }
         if (!_users) return ;
         getUsers(_page, parameters).then(res => {
-            console.log(page, users);
-
             if (res.success) {
                 setUsers([..._users, ...res.users])
                 setPage(_page + 1)

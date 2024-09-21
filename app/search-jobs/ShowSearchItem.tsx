@@ -14,8 +14,8 @@ interface Props {
 
 const JobSearchItem: React.FC<Props> = ({ searchJobs }) => {
     let params = useSearchParams();
-    let _tags: string | null = params.get("tags")
-    let _type: string | null = params.get("type")
+    let _tags: string | null = params?.get("tags") || null
+    let _type: string | null = params?.get("type") || null
     let [jobs, setJobs] = useState<JobInterfaceWithUserData[]>([])
     let [tags, setTags] = useState<string[]>([])
     useEffect(() => {

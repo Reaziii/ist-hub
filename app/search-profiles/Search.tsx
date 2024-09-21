@@ -9,7 +9,7 @@ const Search: React.FC = () => {
     const router = useRouter();
     const path = usePathname();
     const params = useSearchParams();
-    const _skills: string | null = params.get("skills")
+    const _skills: string | null = params?.get("skills") || null
     let inititalValues: {
         skills: string[],
         tempTag: ""

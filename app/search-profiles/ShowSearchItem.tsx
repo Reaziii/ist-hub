@@ -7,7 +7,7 @@ interface Props {
 
 const ShowSearchItem: React.FC<Props> = ({ searchProfile }) => {
     let params = useSearchParams();
-    let _skills: string | null = params.get("skills")
+    let _skills: string | null = params?.get("skills") || null
     let [users, setUsers] = useState<ShortUserInterface[]>([])
     let [skills, setSkills] = useState<string[]>([])
     useEffect(() => {

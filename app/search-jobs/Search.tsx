@@ -13,8 +13,8 @@ const Search: React.FC = () => {
     const router = useRouter();
     const path = usePathname();
     const params = useSearchParams();
-    const _tags: string | null = params.get("tags")
-    const _type: string | null = params.get("type")
+    const _tags: string | null = params?.get("tags") || null
+    const _type: string | null = params?.get("type") || null
     let inititalValues: {
         type: string,
         tags: JobTagInterface[],

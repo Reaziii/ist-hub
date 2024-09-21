@@ -127,6 +127,13 @@ export const toogleVerified = async (userid: string): Promise<ServerMessageInter
             time: new Date()
         })
         user.verified = !user.verified;
+        if(user.verified === false){
+            await UserVerifier.deleteMany({owner : userid});
+            await user.save();
+            return {success : true, msg : "User updated successfully"}
+        }
+
+
         let verifier = await UserVerifier.findOne({ owner: userid });
         if (!verifier) {
             verifier = new UserVerifier({
@@ -136,10 +143,11 @@ export const toogleVerified = async (userid: string): Promise<ServerMessageInter
             })
         }
         verifier.verfier = _admin.admin._id;
+        verifier.byAdmin = true
         await verifier.save();
         await user.save();
         await activity.save();
-        return { success: true, msg: "User text successfully" }
+        return { success: true, msg: "User updated successfully" }
     } catch (err) {
         console.log("admin - user verification failed ===> \n", err);
         return { success: false, msg: "Failed to verify user" }
