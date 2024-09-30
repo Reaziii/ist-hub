@@ -34,7 +34,7 @@ class sendMail {
         {
           'sender': {
             'name': 'IST HUB',
-            'email': 'isthub@ist.edu.bd'
+            'email': 'reaz58844@gmail.com'
           },
           'to': this.to,
           'subject': this.subject,
@@ -47,7 +47,9 @@ class sendMail {
             'content-type': 'application/json'
           }
         }
-      );
+      ).then(resp=>{
+        console.log(resp.data)
+      })
       return { success: true }
     } catch (err) {
 
