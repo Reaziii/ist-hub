@@ -6,6 +6,7 @@ import { ErrorMessage } from "@/constants";
 import UserModel from "@/models/UserModel";
 import MongoConn from "./mongodb";
 import { PipelineStage } from "mongoose";
+import SkillModel from "@/models/SkillModel";
 
 export const uploadProfilePicture = async (form: FormData): Promise<ServerMessageInterface & { img?: string }> => {
     "use server"
@@ -148,73 +149,43 @@ export const searchProfile = async (skills: string[]): Promise<ServerMessageInte
     "use server"
     try {
         skills = skills.map(item => item.toLowerCase())
+        console.log(skills)
         await MongoConn();
-        let pipeline: PipelineStage[] = [];
 
-        pipeline.push({
-            $addFields: {
-                userid: {
-                    $toString: "$_id"
+        let user:ShortUserInterface[] = []
+
+        let users = await UserModel.find()
+
+
+        for(let i = 0;i<users.length;i++){
+            let av = false;
+
+            let _skills = await SkillModel.find({userid : users[i]._id}).lean()
+
+            for(let i = 0;i<_skills.length;i++){
+                if(skills.indexOf(_skills[i].skill.toLowerCase())!=-1){
+                  av = true
                 }
+            
+            
             }
-        })
-        pipeline.push({
-            $lookup: {
-                from: "skills",
-                localField: "userid",
-                foreignField: "userid",
-                pipeline: [
-                    {
-                        $addFields: {
-                            "skillName": {
-                                "$toLower": "$skill"
-                            }
-                        }
-                    }
-                ],
-                as: "skills"
+            if(av == true){
+                user.push({
+                    fullname : users[i].fullname,
+                    email: users[i].email,
+                    photo : users[i].photo,
+                    username: users[i].username,
+                    skills: _skills.map(item=> ({...item, _id : String(item._id)})),
+                    _id : String(users[i]._id),
+                    bio: users[i].bio,
+                    resume: users[i].resume
+                    
+                })
             }
-        })
 
-        pipeline.push({
-            $addFields: {
-                skillItems: "$skills.skillName"
-            }
-        })
 
-        pipeline.push({
-            $addFields: {
-                shouldMatch: {
-                    $setIsSubset: [skills, "$skillItems"]
-                }
-            }
-        })
-
-        pipeline.push({
-            $match: {
-                shouldMatch: true
-            }
-        })
-        pipeline.push({
-            $project: {
-                fullname: 1,
-                resume: 1,
-                email: 1,
-                photo: 1,
-                username: 1,
-                skills: 1,
-                bio: 1,
-                shouldMatch: 1,
-            }
-        })
-
-        let user = await UserModel.aggregate<ShortUserInterface>(pipeline);
-        for (let i = 0; i < user.length; i++) {
-            user[i]._id = String(user[i]._id);
-            for (let j = 0; j < user[i].skills.length; j++) {
-                user[i].skills[j]._id = String(user[i].skills[j]._id)
-            }
         }
+
         return { success: true, msg: "Retrived users", users: user }
     } catch (err) {
         return { success: false, msg: "Failed to retrived", users: [] }

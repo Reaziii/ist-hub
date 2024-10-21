@@ -14,8 +14,10 @@ const ShowSearchItem: React.FC<Props> = ({ searchProfile }) => {
         if (_skills)
             setSkills(_skills.split(','))
     }, [_skills])
+    console.log(_skills)
+
     useEffect(() => {
-        if (_skills)
+        if (_skills?.length)
             searchProfile(skills).then(resp => {
                 setUsers([...resp.users])
             })
